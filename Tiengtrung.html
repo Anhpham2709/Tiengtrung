@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tự học tiếng Trung HSK (Thêm Ngữ Pháp)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior-y: contain; 
+        }
+        .vocab-card .char { font-size: 2.5rem; line-height: 1.2; }
+        .grammar-point {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .grammar-point h4 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #4f46e5; /* indigo-600 */
+            margin-bottom: 0.75rem;
+        }
+        .grammar-point .explanation {
+            color: #374151; /* gray-700 */
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .grammar-point .example-item {
+            margin-bottom: 0.75rem;
+            padding-left: 1rem;
+            border-left: 3px solid #3b82f6; /* blue-500 */
+        }
+        .grammar-point .example-item p { margin-bottom: 0.25rem; }
+        .grammar-point .example-zh { font-weight: 500; }
+        .grammar-point .example-pinyin { color: #0ea5e9; /* sky-500 */ font-style: italic; font-size: 0.9em; }
+        .grammar-point .example-vi { color: #64748b; /* slate-500 */ font-size: 0.9em;}
+
+
+        .control-button, .tab-button-main, .action-button, .modal-button, .speed-control-select {
+            padding: 0.65rem 1.3rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid transparent;
+        }
+        .control-button:hover, .tab-button-main:hover, .action-button:hover, .modal-button:hover, .speed-control-select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .tab-button-main.active {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        .speed-control-select {
+            background-color: #fff; 
+            border-color: #d1d5db; 
+            color: #374151; 
+        }
+      
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1050; 
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .message-box.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .message-box.success { background-color: #4CAF50; color: white; }
+        .message-box.info { background-color: #2196F3; color: white; }
+        .message-box.error { background-color: #f44336; color: white; }
+        .message-box.warning { background-color: #ff9800; color: white; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5); 
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px; /* Increased width for grammar modal */
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .modal-close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+        .modal-close-button:hover,
+        .modal-close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .paragraph-list-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .paragraph-list-item:hover {
+            background-color: #f0f0f0;
+        }
+        .paragraph-list-item:last-child {
+            border-bottom: none;
+        }
+
+        #wordTooltip {
+            position: absolute;
+            display: none;
+            background-color: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            z-index: 1100; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            pointer-events: none; 
+        }
+        #listeningTypingInputArea {
+            min-height: 100px;
+        }
+        #originalTextDisplayContainer {
+            border: 1px solid #e2e8f0; 
+            padding: 1rem;
+            border-radius: 0.375rem; 
+            margin-top: 1rem;
+            background-color: #f8fafc; 
+        }
+
+        #floatingPomodoroBubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 90px; 
+            height: 90px; 
+            background-color: #0ea5e9; 
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+            cursor: pointer;
+            z-index: 1010; 
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        #floatingPomodoroBubble.work { background-color: #ef4444; } 
+        #floatingPomodoroBubble.break { background-color: #22c55e; } 
+
+        #floatingPomodoroTime {
+            font-size: 1.5rem; 
+            font-weight: bold;
+            line-height: 1;
+        }
+        #floatingPomodoroControls {
+            margin-top: 5px;
+            display: flex;
+            gap: 10px;
+        }
+        .pomodoro-icon-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem; 
+            cursor: pointer;
+            padding: 2px;
+        }
+         .pomodoro-icon-button:hover {
+            opacity: 0.8;
+        }
+        #pomodoroTimerContainer { 
+            display: none;
+        }
+
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+    <div id="messageBox" class="message-box"></div>
+    <div id="wordTooltip"></div>
+
+    <div id="floatingPomodoroBubble">
+        <span id="floatingPomodoroTime">25:00</span>
+        <div id="floatingPomodoroControls">
+            <button id="floatingPomodoroStartPause" class="pomodoro-icon-button" title="Bắt đầu/Tạm dừng">
+                <i id="floatingPomodoroStatusIcon" class="fas fa-play"></i>
+            </button>
+            <button id="floatingPomodoroReset" class="pomodoro-icon-button" title="Đặt lại">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-6 max-w-7xl">
+        <header class="my-6 md:my-8">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-sky-600">Học Tiếng Trung Toàn Diện HSK</h1>
+            <p class="text-center text-slate-600 mt-2 text-sm md:text-base">Nghe - Nói - Đọc - Viết & Ngữ Pháp HSK 1 & 2</p>
+        </header>
+
+        <div class="flex justify-center mb-6 space-x-2 md:space-x-3">
+            <button id="hsk1ToggleBtn" class="control-button bg-sky-500 text-white">HSK 1</button>
+            <button id="hsk2ToggleBtn" class="control-button bg-slate-200 text-slate-700 hover:bg-slate-300">HSK 2</button>
+        </div>
+
+        <div id="pomodoroTimerContainer"></div> <div class="mb-8 flex flex-wrap justify-center gap-2 border-b border-slate-300 pb-4">
+            <button data-tab="vocabulary" class="tab-button-main">
+                <i class="fas fa-book-open mr-2"></i>Từ Vựng
+            </button>
+            <button data-tab="listeningTyping" class="tab-button-main">
+                <i class="fas fa-headphones-alt mr-2"></i>Nghe Viết & Đọc
+            </button>
+            <button data-tab="grammar" class="tab-button-main"> <i class="fas fa-spell-check mr-2"></i>Ngữ Pháp
+            </button>
+        </div>
+
+        <section id="vocabularySection" class="section active">
+            <h2 class="text-2xl font-semibold text-center mb-6 text-sky-700">Từ Vựng <span id="currentVocabLevelDisplay">HSK 1</span></h2>
+            <div class="flex flex-col sm:flex-row justify-center items-center mb-6 space-y-3 sm:space-y-0 sm:space-x-3">
+                <button id="togglePinyin" class="control-button bg-emerald-500 hover:bg-emerald-600 text-white w-full sm:w-auto">Ẩn/Hiện Pinyin</button>
+                <button id="toggleMeaning" class="control-button bg-amber-500 hover:bg-amber-600 text-white w-full sm:w-auto">Ẩn/Hiện Nghĩa</button>
+                <button id="toggleExamples" class="control-button bg-purple-500 hover:bg-purple-600 text-white w-full sm:w-auto">Ẩn/Hiện Ví dụ</button>
+            </div>
+            <div id="settingsInfoVocab" class="text-center mb-6 text-sm text-slate-500">
+                Pinyin: <span id="pinyinStatusVocab">Hiện</span> | Nghĩa: <span id="meaningStatusVocab">Hiện</span> | Ví dụ: <span id="exampleStatusVocab">Hiện</span>
+            </div>
+            <div id="vocabularyGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+            </div>
+        </section>
+
+        <section id="listeningTypingSection" class="section">
+            <h2 class="text-2xl font-semibold text-center mb-6 text-violet-700">Luyện Nghe Viết & Đọc Hiểu <span id="currentListeningTypingLevelDisplay">HSK 1</span></h2>
+            <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+                 <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button id="listParagraphsBtn" class="action-button bg-cyan-500 hover:bg-cyan-600 text-white">
+                        <i class="fas fa-list-ul mr-2"></i>Danh sách bài
+                    </button>
+                    <button id="addCustomParagraphBtn" class="action-button bg-lime-500 hover:bg-lime-600 text-white">
+                        <i class="fas fa-plus-circle mr-2"></i>Thêm bài mới
+                    </button>
+                </div>
+
+                <p id="listeningTypingParagraphTitle" class="text-lg font-semibold text-violet-600 mb-3 text-center"></p>
+                
+                <div class="flex flex-wrap justify-center items-center gap-3 mb-4">
+                    <button id="playPauseListeningTypingBtn" class="action-button bg-sky-500 hover:bg-sky-600 text-white w-36">
+                        <i id="playPauseListeningTypingIcon" class="fas fa-play mr-2"></i><span id="playPauseListeningTypingText">Phát</span>
+                    </button>
+                    <button id="restartListeningTypingBtn" class="action-button bg-orange-500 hover:bg-orange-600 text-white w-36">
+                        <i class="fas fa-redo mr-2"></i>Nghe Lại
+                    </button>
+                </div>
+                <div class="flex justify-center mb-6">
+                    <label for="playbackSpeedSelect" class="mr-2 self-center text-sm font-medium text-slate-700">Tốc độ:</label>
+                    <select id="playbackSpeedSelect" class="speed-control-select bg-white border border-slate-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500 text-sm">
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x (Mặc định)</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="listeningTypingInputArea" class="block text-sm font-medium text-slate-700 mb-1">Nhập nội dung bạn nghe được (Nghe Viết):</label>
+                    <textarea id="listeningTypingInputArea" rows="5" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm p-2" placeholder="Gõ tiếng Trung vào đây..."></textarea>
+                </div>
+
+                <button id="toggleOriginalTextBtn" class="action-button bg-indigo-500 hover:bg-indigo-600 text-white w-full mb-4">
+                    <i class="fas fa-eye mr-2"></i>Hiện Đáp Án / Nội dung đọc
+                </button>
+
+                <div id="originalTextDisplayContainer" class="hidden">
+                    <h4 class="text-md font-semibold text-slate-700 mb-2">Đáp án / Nội dung đọc:</h4>
+                    <p id="originalTextZh" class="text-xl leading-relaxed mb-2 select-text"></p> 
+                    <p id="originalTextPinyin" class="text-sky-500 italic mb-2"></p>
+                    <p id="originalTextVi" class="text-slate-600"></p>
+                    <div class="flex flex-wrap justify-start gap-2 mt-3">
+                        <button id="toggleOriginalPinyinBtn" class="action-button bg-emerald-500 hover:bg-emerald-600 text-white text-xs py-1 px-2">Ẩn/Hiện Pinyin</button>
+                        <button id="toggleOriginalViBtn" class="action-button bg-amber-500 hover:bg-amber-600 text-white text-xs py-1 px-2">Ẩn/Hiện Nghĩa</button>
+                    </div>
+                </div>
+                 <div class="flex justify-between mt-8">
+                    <button id="prevListeningTypingParagraphBtn" class="action-button bg-slate-400 hover:bg-slate-500 text-white">&lt; Bài Trước</button>
+                    <button id="nextListeningTypingParagraphBtn" class="action-button bg-slate-400 hover:bg-slate-500 text-white">Bài Tiếp &gt;</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="grammarSection" class="section">
+            <h2 class="text-2xl font-semibold text-center mb-6 text-indigo-700">Ngữ Pháp <span id="currentGrammarLevelDisplay">HSK 1</span></h2>
+            <div id="grammarPointsContainer" class="max-w-3xl mx-auto">
+                </div>
+        </section>
+
+
+        <footer class="text-center mt-12 py-6 border-t border-slate-300">
+            <p class="text-slate-500 text-sm">&copy; 2025 Công cụ học tiếng Trung. Chúc bạn học tốt!</p>
+        </footer>
+    </div>
+
+    <div id="listParagraphsModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button" data-modal-id="listParagraphsModal">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-teal-600">Danh sách bài (<span id="modalParagraphLevel"></span>)</h3>
+            <div id="paragraphsListContainer" class="max-h-60 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <div id="addParagraphModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button" data-modal-id="addParagraphModal">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-lime-600">Thêm bài mới</h3>
+            <div class="space-y-4">
+                 <div>
+                    <label for="customParagraphTitleInput" class="block text-sm font-medium text-slate-700">Tiêu đề bài:</label>
+                    <input type="text" id="customParagraphTitleInput" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Nhập tiêu đề cho bài..."/>
+                </div>
+                <div>
+                    <label for="customParagraphZh" class="block text-sm font-medium text-slate-700">Tiếng Trung:</label>
+                    <textarea id="customParagraphZh" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="输入中文文本..."></textarea>
+                </div>
+                <div>
+                    <label for="customParagraphPinyin" class="block text-sm font-medium text-slate-700">Pinyin:</label>
+                    <textarea id="customParagraphPinyin" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="shūrù pīnyīn..."></textarea>
+                </div>
+                <div>
+                    <label for="customParagraphVi" class="block text-sm font-medium text-slate-700">Nghĩa Tiếng Việt:</label>
+                    <textarea id="customParagraphVi" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" placeholder="Nhập nghĩa tiếng Việt..."></textarea>
+                </div>
+                <button id="saveCustomParagraphBtn" class="modal-button bg-green-500 hover:bg-green-600 text-white w-full">
+                    <i class="fas fa-save mr-2"></i>Lưu bài
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Dữ liệu ---
+        const vocabData = { // Dữ liệu từ vựng (giữ nguyên như trước)
+            hsk1: [
+                { char: "你好", pinyin: "nǐ hǎo", meaning: "Xin chào", example: { zh: "老师，你好！", pinyin: "Lǎoshī, nǐ hǎo!", vi: "Chào thầy/cô!" } },
+                { char: "谢谢", pinyin: "xièxie", meaning: "Cảm ơn", example: { zh: "谢谢你的帮助。", pinyin: "Xièxie nǐ de bāngzhù.", vi: "Cảm ơn sự giúp đỡ của bạn." } },
+                { char: "不客气", pinyin: "bú kèqi", meaning: "Đừng khách sáo", example: { zh: "A: 谢谢你。 B: 不客气。", pinyin: "A: Xièxie nǐ. B: Bú kèqi.", vi: "A: Cảm ơn bạn. B: Đừng khách sáo." } },
+                { char: "再见", pinyin: "zàijiàn", meaning: "Tạm biệt", example: { zh: "明天见，再见！", pinyin: "Míngtiān jiàn, zàijiàn!", vi: "Mai gặp lại, tạm biệt!" } },
+                { char: "对不起", pinyin: "duìbuqǐ", meaning: "Xin lỗi", example: { zh: "对不起，我来晚了。", pinyin: "Duìbuqǐ, wǒ lái wǎn le.", vi: "Xin lỗi, tôi đến muộn." } },
+                { char: "没关系", pinyin: "méi guānxi", meaning: "Không sao đâu", example: { zh: "A: 对不起。 B: 没关系。", pinyin: "A: Duìbuqǐ. B: Méi guānxi.", vi: "A: Xin lỗi. B: Không sao đâu." } },
+                { char: "我", pinyin: "wǒ", meaning: "Tôi", example: { zh: "我是学生。", pinyin: "Wǒ shì xuéshēng.", vi: "Tôi là học sinh." } },
+                { char: "你", pinyin: "nǐ", meaning: "Bạn", example: { zh: "你叫什么名字？", pinyin: "Nǐ jiào shénme míngzi?", vi: "Bạn tên là gì?" } },
+                { char: "他", pinyin: "tā", meaning: "Anh ấy, Ông ấy", example: { zh: "他是我的朋友。", pinyin: "Tā shì wǒ de péngyou.", vi: "Anh ấy là bạn của tôi." } },
+                { char: "她", pinyin: "tā", meaning: "Cô ấy, Bà ấy", example: { zh: "她喜欢看书。", pinyin: "Tā xǐhuān kàn shū.", vi: "Cô ấy thích đọc sách." } },
+                { char: "我们", pinyin: "wǒmen", meaning: "Chúng tôi, chúng ta", example: { zh: "我们一起去吃饭吧。", pinyin: "Wǒmen yìqǐ qù chīfàn ba.", vi: "Chúng ta cùng đi ăn cơm nhé." } },
+                { char: "是", pinyin: "shì", meaning: "Là, phải", example: { zh: "这是苹果吗？是的。", pinyin: "Zhè shì píngguǒ ma? Shì de.", vi: "Đây là táo phải không? Phải." } },
+                { char: "有", pinyin: "yǒu", meaning: "Có", example: { zh: "我有一只猫。", pinyin: "Wǒ yǒu yì zhī māo.", vi: "Tôi có một con mèo." } },
+                { char: "吃", pinyin: "chī", meaning: "Ăn", example: { zh: "你吃饭了吗？", pinyin: "Nǐ chīfàn le ma?", vi: "Bạn ăn cơm chưa?" } },
+                { char: "喝", pinyin: "hē", meaning: "Uống", example: { zh: "我想喝水。", pinyin: "Wǒ xiǎng hē shuǐ.", vi: "Tôi muốn uống nước." } },
+                { char: "看", pinyin: "kàn", meaning: "Nhìn, xem, đọc", example: { zh: "你在看什么？", pinyin: "Nǐ zài kàn shénme?", vi: "Bạn đang xem gì vậy?" } },
+                { char: "听", pinyin: "tīng", meaning: "Nghe", example: { zh: "请听我说。", pinyin: "Qǐng tīng wǒ shuō.", vi: "Xin hãy nghe tôi nói." } },
+                { char: "说", pinyin: "shuō", meaning: "Nói", example: { zh: "他会说汉语。", pinyin: "Tā huì shuō Hànyǔ.", vi: "Anh ấy biết nói tiếng Hán." } },
+                { char: "读", pinyin: "dú", meaning: "Đọc (thành tiếng)", example: { zh: "请跟我读。", pinyin: "Qǐng gēn wǒ dú.", vi: "Xin hãy đọc theo tôi." } },
+                { char: "写", pinyin: "xiě", meaning: "Viết", example: { zh: "你会写汉字吗？", pinyin: "Nǐ huì xiě Hànzì ma?", vi: "Bạn biết viết chữ Hán không?" } },
+                { char: "去", pinyin: "qù", meaning: "Đi", example: { zh: "明天我去学校。", pinyin: "Míngtiān wǒ qù xuéxiào.", vi: "Ngày mai tôi đi học." } },
+                { char: "来", pinyin: "lái", meaning: "Đến", example: { zh: "他什么时候来？", pinyin: "Tā shénme shíhou lái?", vi: "Khi nào anh ấy đến?" } },
+                { char: "爱", pinyin: "ài", meaning: "Yêu, thích", example: { zh: "我爱我的家人。", pinyin: "Wǒ ài wǒ de jiārén.", vi: "Tôi yêu gia đình tôi." } },
+                { char: "喜欢", pinyin: "xǐhuan", meaning: "Thích", example: { zh: "我喜欢喝茶。", pinyin: "Wǒ xǐhuan hē chá.", vi: "Tôi thích uống trà." } },
+                { char: "叫", pinyin: "jiào", meaning: "Gọi, tên là", example: { zh: "我叫小明。", pinyin: "Wǒ jiào Xiǎomíng.", vi: "Tôi tên là Tiểu Minh." } },
+                { char: "做", pinyin: "zuò", meaning: "Làm", example: { zh: "你在做什么？", pinyin: "Nǐ zài zuò shénme?", vi: "Bạn đang làm gì đó?" } },
+                { char: "买", pinyin: "mǎi", meaning: "Mua", example: { zh: "我想买这个。", pinyin: "Wǒ xiǎng mǎi zhège.", vi: "Tôi muốn mua cái này." } },
+                { char: "家", pinyin: "jiā", meaning: "Nhà, gia đình", example: { zh: "我家有五口人。", pinyin: "Wǒ jiā yǒu wǔ kǒu rén.", vi: "Nhà tôi có năm người." } },
+                { char: "学校", pinyin: "xuéxiào", meaning: "Trường học", example: { zh: "这是我的学校。", pinyin: "Zhè shì wǒ de xuéxiào.", vi: "Đây là trường của tôi." } },
+                { char: "商店", pinyin: "shāngdiàn", meaning: "Cửa hàng", example: { zh: "妈妈去商店了。", pinyin: "Māma qù shāngdiàn le.", vi: "Mẹ đi cửa hàng rồi." } },
+                { char: "医院", pinyin: "yīyuàn", meaning: "Bệnh viện", example: { zh: "他在医院工作。", pinyin: "Tā zài yīyuàn gōngzuò.", vi: "Anh ấy làm việc ở bệnh viện." } },
+                { char: "中国", pinyin: "Zhōngguó", meaning: "Trung Quốc", example: { zh: "我喜欢中国文化。", pinyin: "Wǒ xǐhuan Zhōngguó wénhuà.", vi: "Tôi thích văn hóa Trung Quốc." } },
+                { char: "北京", pinyin: "Běijīng", meaning: "Bắc Kinh", example: { zh: "北京是中国的首都。", pinyin: "Běijīng shì Zhōngguó de shǒudū.", vi: "Bắc Kinh là thủ đô của Trung Quốc." } },
+                { char: "老师", pinyin: "lǎoshī", meaning: "Giáo viên", example: { zh: "王老师教我们汉语。", pinyin: "Wáng lǎoshī jiāo wǒmen Hànyǔ.", vi: "Thầy Vương dạy chúng tôi tiếng Hán." } },
+                { char: "学生", pinyin: "xuésheng", meaning: "Học sinh", example: { zh: "他们都是好学生。", pinyin: "Tāmen dōu shì hǎo xuésheng.", vi: "Họ đều là học sinh giỏi." } },
+                { char: "朋友", pinyin: "péngyou", meaning: "Bạn bè", example: { zh: "他是我最好的朋友。", pinyin: "Tā shì wǒ zuì hǎo de péngyou.", vi: "Anh ấy là bạn tốt nhất của tôi." } },
+                { char: "妈妈", pinyin: "māma", meaning: "Mẹ", example: { zh: "我妈妈做的菜很好吃。", pinyin: "Wǒ māma zuò de cài hěn hǎochī.", vi: "Món ăn mẹ tôi làm rất ngon." } },
+                { char: "爸爸", pinyin: "bàba", meaning: "Bố", example: { zh: "我爸爸是工程师。", pinyin: "Wǒ bàba shì gōngchéngshī.", vi: "Bố tôi là kỹ sư." } },
+                { char: "猫", pinyin: "māo", meaning: "Mèo", example: { zh: "这只小猫很可爱。", pinyin: "Zhè zhī xiǎo māo hěn kě'ài.", vi: "Chú mèo con này rất đáng yêu." } },
+                { char: "狗", pinyin: "gǒu", meaning: "Chó", example: { zh: "他家有一条大狗。", pinyin: "Tā jiā yǒu yì tiáo dà gǒu.", vi: "Nhà anh ấy có một con chó lớn." } },
+                { char: "水", pinyin: "shuǐ", meaning: "Nước", example: { zh: "请给我一杯水。", pinyin: "Qǐng gěi wǒ yì bēi shuǐ.", vi: "Làm ơn cho tôi một cốc nước." } },
+                { char: "茶", pinyin: "chá", meaning: "Trà", example: { zh: "你喜欢喝绿茶还是红茶？", pinyin: "Nǐ xǐhuan hē lǜchá háishì hóngchá?", vi: "Bạn thích uống trà xanh hay trà đen?" } },
+                { char: "米饭", pinyin: "mǐfàn", meaning: "Cơm", example: { zh: "我今天想吃米饭。", pinyin: "Wǒ jīntiān xiǎng chī mǐfàn.", vi: "Hôm nay tôi muốn ăn cơm." } },
+                { char: "菜", pinyin: "cài", meaning: "Món ăn, rau", example: { zh: "这个菜太咸了。", pinyin: "Zhège cài tài xián le.", vi: "Món này mặn quá." } },
+                { char: "苹果", pinyin: "píngguǒ", meaning: "Táo", example: { zh: "一天一个苹果，医生远离我。", pinyin: "Yì tiān yí ge píngguǒ, yīshēng yuǎnlí wǒ.", vi: "Mỗi ngày một quả táo, bác sĩ sẽ tránh xa bạn." } },
+                { char: "钱", pinyin: "qián", meaning: "Tiền", example: { zh: "这本书多少钱？", pinyin: "Zhè běn shū duōshao qián?", vi: "Quyển sách này bao nhiêu tiền?" } },
+                { char: "飞机", pinyin: "fēijī", meaning: "Máy bay", example: { zh: "我们坐飞机去上海。", pinyin: "Wǒmen zuò fēijī qù Shànghǎi.", vi: "Chúng tôi đi máy bay đến Thượng Hải." } },
+                { char: "出租车", pinyin: "chūzūchē", meaning: "Xe taxi", example: { zh: "太晚了，我们打出租车回家吧。", pinyin: "Tài wǎn le, wǒmen dǎ chūzūchē huí jiā ba.", vi: "Muộn quá rồi, chúng ta gọi taxi về nhà đi." } },
+                { char: "电脑", pinyin: "diànnǎo", meaning: "Máy tính", example: { zh: "我的电脑坏了。", pinyin: "Wǒ de diànnǎo huài le.", vi: "Máy tính của tôi hỏng rồi." } },
+                { char: "电视", pinyin: "diànshì", meaning: "Ti vi", example: { zh: "晚饭后我们看电视。", pinyin: "Wǎnfàn hòu wǒmen kàn diànshì.", vi: "Sau bữa tối chúng ta xem ti vi." } },
+                { char: "电影", pinyin: "diànyǐng", meaning: "Phim", example: { zh: "你喜欢看什么电影？", pinyin: "Nǐ xǐhuan kàn shénme diànyǐng?", vi: "Bạn thích xem phim gì?" } },
+                { char: "天气", pinyin: "tiānqì", meaning: "Thời tiết", example: { zh: "今天天气真好！", pinyin: "Jīntiān tiānqì zhēn hǎo!", vi: "Thời tiết hôm nay thật đẹp!" } },
+                { char: "书", pinyin: "shū", meaning: "Sách", example: { zh: "我喜欢读历史书。", pinyin: "Wǒ xǐhuan dú lìshǐ shū.", vi: "Tôi thích đọc sách lịch sử." } },
+                { char: "衣服", pinyin: "yīfu", meaning: "Quần áo", example: { zh: "这件衣服很漂亮。", pinyin: "Zhè jiàn yīfu hěn piàoliang.", vi: "Bộ quần áo này rất đẹp." } },
+                { char: "人", pinyin: "rén", meaning: "Người", example: { zh: "公园里有很多人。", pinyin: "Gōngyuán lǐ yǒu hěn duō rén.", vi: "Trong công viên có rất nhiều người." } },
+                { char: "名字", pinyin: "míngzi", meaning: "Tên", example: { zh: "你的名字是什么？", pinyin: "Nǐ de míngzi shì shénme?", vi: "Tên của bạn là gì?" } },
+                { char: "汉语", pinyin: "Hànyǔ", meaning: "Tiếng Hán", example: { zh: "学习汉语有意思吗？", pinyin: "Xuéxí Hànyǔ yǒuyìsi ma?", vi: "Học tiếng Hán có thú vị không?" } },
+                { char: "好", pinyin: "hǎo", meaning: "Tốt, khỏe, được", example: { zh: "这个主意很好。", pinyin: "Zhège zhǔyi hěn hǎo.", vi: "Ý kiến này rất hay." } },
+                { char: "大", pinyin: "dà", meaning: "To, lớn", example: { zh: "他的房子很大。", pinyin: "Tā de fángzi hěn dà.", vi: "Nhà của anh ấy rất lớn." } },
+                { char: "小", pinyin: "xiǎo", meaning: "Nhỏ, bé", example: { zh: "这只小狗很可爱。", pinyin: "Zhè zhī xiǎo gǒu hěn kě'ài.", vi: "Chú chó con này rất đáng yêu." } },
+                { char: "多", pinyin: "duō", meaning: "Nhiều", example: { zh: "这里人很多。", pinyin: "Zhèli rén hěn duō.", vi: "Ở đây rất đông người." } },
+                { char: "少", pinyin: "shǎo", meaning: "Ít", example: { zh: "我的时间很少。", pinyin: "Wǒ de shíjiān hěn shǎo.", vi: "Tôi có rất ít thời gian." } },
+                { char: "冷", pinyin: "lěng", meaning: "Lạnh", example: { zh: "今天有点冷。", pinyin: "Jīntiān yǒudiǎnr lěng.", vi: "Hôm nay hơi lạnh." } },
+                { char: "热", pinyin: "rè", meaning: "Nóng", example: { zh: "夏天天气很热。", pinyin: "Xiàtiān tiānqì hěn rè.", vi: "Mùa hè thời tiết rất nóng." } },
+                { char: "高兴", pinyin: "gāoxìng", meaning: "Vui vẻ", example: { zh: "见到你我很高兴。", pinyin: "Jiàn dào nǐ wǒ hěn gāoxìng.", vi: "Gặp bạn tôi rất vui." } },
+                { char: "漂亮", pinyin: "piàoliang", meaning: "Xinh đẹp", example: { zh: "她的裙子很漂亮。", pinyin: "Tā de qúnzi hěn piàoliang.", vi: "Cái váy của cô ấy rất đẹp." } },
+                { char: "很", pinyin: "hěn", meaning: "Rất", example: { zh: "我很好，谢谢。", pinyin: "Wǒ hěn hǎo, xièxie.", vi: "Tôi rất khỏe, cảm ơn." } },
+                { char: "不", pinyin: "bù", meaning: "Không (phủ định)", example: { zh: "我不是老师。", pinyin: "Wǒ bú shì lǎoshī.", vi: "Tôi không phải là giáo viên." } },
+                { char: "没", pinyin: "méi", meaning: "Chưa, không (phủ định cho '有')", example: { zh: "我没去过中国。", pinyin: "Wǒ méi qùguo Zhōngguó.", vi: "Tôi chưa từng đi Trung Quốc." } },
+                { char: "太", pinyin: "tài", meaning: "Quá, lắm", example: { zh: "这个太贵了！", pinyin: "Zhège tài guì le!", vi: "Cái này đắt quá!" } },
+                { char: "一", pinyin: "yī", meaning: "Một", example: { zh: "我有一个哥哥。", pinyin: "Wǒ yǒu yí ge gēge.", vi: "Tôi có một người anh trai." } },
+                { char: "二", pinyin: "èr", meaning: "Hai", example: { zh: "桌子上有两本书。", pinyin: "Zhuōzi shàng yǒu liǎng běn shū.", vi: "Trên bàn có hai quyển sách. (Dùng 两 khi đi với lượng từ)" } },
+                { char: "三", pinyin: "sān", meaning: "Ba", example: { zh: "三明治", pinyin: "Sānmíngzhì", vi: "Bánh sandwich (ba miếng)" } },
+                { char: "四", pinyin: "sì", meaning: "Bốn", example: { zh: "一年有四季。", pinyin: "Yì nián yǒu sì jì.", vi: "Một năm có bốn mùa." } },
+                { char: "五", pinyin: "wǔ", meaning: "Năm", example: { zh: "五颜六色", pinyin: "Wǔ yán liù sè", vi: "Năm màu sáu sắc (đủ màu sắc)" } },
+                { char: "六", pinyin: "liù", meaning: "Sáu", example: { zh: "他六点起床。", pinyin: "Tā liù diǎn qǐchuáng.", vi: "Anh ấy dậy lúc sáu giờ." } },
+                { char: "七", pinyin: "qī", meaning: "Bảy", example: { zh: "一个星期有七天。", pinyin: "Yí ge xīngqī yǒu qī tiān.", vi: "Một tuần có bảy ngày." } },
+                { char: "八", pinyin: "bā", meaning: "Tám", example: { zh: "八仙过海", pinyin: "Bā xiān guò hǎi", vi: "Bát tiên quá hải (mỗi người một vẻ)" } },
+                { char: "九", pinyin: "jiǔ", meaning: "Chín", example: { zh: "九牛一毛", pinyin: "Jiǔ niú yì máo", vi: "Chín trâu một sợi lông (rất nhỏ bé, không đáng kể)" } },
+                { char: "十", pinyin: "shí", meaning: "Mười", example: { zh: "十全十美", pinyin: "Shí quán shí měi", vi: "Thập toàn thập mỹ (hoàn hảo)" } },
+                { char: "个", pinyin: "ge", meaning: "Cái, chiếc, người (lượng từ phổ biến)", example: { zh: "三个人", pinyin: "Sān ge rén", vi: "Ba người" } },
+                { char: "岁", pinyin: "suì", meaning: "Tuổi", example: { zh: "你几岁了？", pinyin: "Nǐ jǐ suì le?", vi: "Bạn mấy tuổi rồi?" } },
+                { char: "本", pinyin: "běn", meaning: "Quyển (dùng cho sách, vở)", example: { zh: "这本书很好看。", pinyin: "Zhè běn shū hěn hǎokàn.", vi: "Quyển sách này rất hay." } },
+                { char: "些", pinyin: "xiē", meaning: "Một vài, một ít", example: { zh: "我想买些水果。", pinyin: "Wǒ xiǎng mǎi xiē shuǐguǒ.", vi: "Tôi muốn mua một ít hoa quả." } },
+                { char: "块", pinyin: "kuài", meaning: "Đồng (tiền), miếng", example: { zh: "这块蛋糕很好吃。", pinyin: "Zhè kuài dàngāo hěn hǎochī.", vi: "Miếng bánh ngọt này rất ngon." } },
+                { char: "年", pinyin: "nián", meaning: "Năm", example: { zh: "今年是2025年。", pinyin: "Jīnnián shì èr líng èr wǔ nián.", vi: "Năm nay là năm 2025." } },
+                { char: "月", pinyin: "yuè", meaning: "Tháng, mặt trăng", example: { zh: "今天是五月十九号。", pinyin: "Jīntiān shì wǔ yuè shíjiǔ hào.", vi: "Hôm nay là ngày 19 tháng 5." } },
+                { char: "日", pinyin: "rì", meaning: "Ngày, mặt trời", example: { zh: "生日快乐！", pinyin: "Shēngrì kuàilè!", vi: "Chúc mừng sinh nhật!" } },
+                { char: "星期", pinyin: "xīngqī", meaning: "Tuần", example: { zh: "一个星期有七天。", pinyin: "Yí ge xīngqī yǒu qī tiān.", vi: "Một tuần có bảy ngày." } },
+                { char: "点", pinyin: "diǎn", meaning: "Giờ (thời gian), điểm", example: { zh: "现在几点了？", pinyin: "Xiànzài jǐ diǎn le?", vi: "Bây giờ là mấy giờ rồi?" } },
+                { char: "分钟", pinyin: "fēnzhōng", meaning: "Phút", example: { zh: "请等我五分钟。", pinyin: "Qǐng děng wǒ wǔ fēnzhōng.", vi: "Xin đợi tôi năm phút." } },
+                { char: "现在", pinyin: "xiànzài", meaning: "Bây giờ, hiện tại", example: { zh: "你现在在哪里？", pinyin: "Nǐ xiànzài zài nǎli?", vi: "Bây giờ bạn đang ở đâu?" } },
+                { char: "时候", pinyin: "shíhou", meaning: "Khi, lúc", example: { zh: "你什么时候回家？", pinyin: "Nǐ shénme shíhou huí jiā?", vi: "Khi nào bạn về nhà?" } },
+                { char: "早上", pinyin: "zǎoshang", meaning: "Buổi sáng", example: { zh: "早上好！", pinyin: "Zǎoshang hǎo!", vi: "Chào buổi sáng!" } },
+                { char: "中午", pinyin: "zhōngwǔ", meaning: "Buổi trưa", example: { zh: "中午我们吃面条。", pinyin: "Zhōngwǔ wǒmen chī miàntiáo.", vi: "Buổi trưa chúng tôi ăn mì." } },
+                { char: "下午", pinyin: "xiàwǔ", meaning: "Buổi chiều", example: { zh: "下午你有空吗？", pinyin: "Xiàwǔ nǐ yǒu kòng ma?", vi: "Buổi chiều bạn có rảnh không?" } },
+                { char: "今天", pinyin: "jīntiān", meaning: "Hôm nay", example: { zh: "今天天气不错。", pinyin: "Jīntiān tiānqì búcuò.", vi: "Thời tiết hôm nay không tệ." } },
+                { char: "明天", pinyin: "míngtiān", meaning: "Ngày mai", example: { zh: "明天是星期一。", pinyin: "Míngtiān shì xīngqīyī.", vi: "Ngày mai là thứ Hai." } },
+                { char: "昨天", pinyin: "zuótiān", meaning: "Hôm qua", example: { zh: "我昨天去看电影了。", pinyin: "Wǒ zuótiān qù kàn diànyǐng le.", vi: "Hôm qua tôi đi xem phim rồi." } },
+                { char: "这儿", pinyin: "zhèr", meaning: "Ở đây, chỗ này", example: { zh: "请坐在这儿。", pinyin: "Qǐng zuò zài zhèr.", vi: "Mời ngồi ở đây." } },
+                { char: "那儿", pinyin: "nàr", meaning: "Ở đó, chỗ kia", example: { zh: "我的书在那儿。", pinyin: "Wǒ de shū zài nàr.", vi: "Sách của tôi ở đằng kia." } },
+                { char: "哪儿", pinyin: "nǎr", meaning: "Ở đâu", example: { zh: "洗手间在哪儿？", pinyin: "Xǐshǒujiān zài nǎr?", vi: "Nhà vệ sinh ở đâu?" } },
+                { char: "在", pinyin: "zài", meaning: "Ở, tại (đang)", example: { zh: "他在看电视。", pinyin: "Tā zài kàn diànshì.", vi: "Anh ấy đang xem ti vi." } },
+                { char: "和", pinyin: "hé", meaning: "Và, với", example: { zh: "我和我的朋友。", pinyin: "Wǒ hé wǒ de péngyou.", vi: "Tôi và bạn của tôi." } },
+                { char: "的", pinyin: "de", meaning: "Của (trợ từ kết cấu)", example: { zh: "这是我的书。", pinyin: "Zhè shì wǒ de shū.", vi: "Đây là sách của tôi." } },
+                { char: "了", pinyin: "le", meaning: "Rồi (trợ từ ngữ khí)", example: { zh: "我吃饭了。", pinyin: "Wǒ chīfàn le.", vi: "Tôi ăn cơm rồi." } },
+                { char: "吗", pinyin: "ma", meaning: "Không? (trợ từ nghi vấn)", example: { zh: "你好吗？", pinyin: "Nǐ hǎo ma?", vi: "Bạn khỏe không?" } },
+                { char: "呢", pinyin: "ne", meaning: "Thế còn? (trợ từ nghi vấn)", example: { zh: "我很好，你呢？", pinyin: "Wǒ hěn hǎo, nǐ ne?", vi: "Tôi rất khỏe, còn bạn thì sao?" } },
+                { char: "喂", pinyin: "wèi", meaning: "A lô (khi gọi điện thoại)", example: { zh: "喂，请问是王老师吗？", pinyin: "Wèi, qǐngwèn shì Wáng lǎoshī ma?", vi: "A lô, xin hỏi có phải thầy Vương không ạ?" } },
+            ],
+            hsk2: [
+                { char: "帮助", pinyin: "bāngzhù", meaning: "Giúp đỡ", example: { zh: "谢谢你的帮助。", pinyin: "Xièxie nǐ de bāngzhù.", vi: "Cảm ơn sự giúp đỡ của bạn." } },
+                { char: "唱歌", pinyin: "chànggē", meaning: "Hát", example: { zh: "她唱歌唱得很好听。", pinyin: "Tā chànggē chàng de hěn hǎotīng.", vi: "Cô ấy hát rất hay." } },
+                { char: "穿", pinyin: "chuān", meaning: "Mặc", example: { zh: "今天很冷，多穿点衣服。", pinyin: "Jīntiān hěn lěng, duō chuān diǎn yīfu.", vi: "Hôm nay rất lạnh, mặc thêm quần áo vào." } },
+                { char: "到", pinyin: "dào", meaning: "Đến", example: { zh: "我们几点到北京？", pinyin: "Wǒmen jǐ diǎn dào Běijīng?", vi: "Mấy giờ chúng ta đến Bắc Kinh?" } },
+                { char: "等", pinyin: "děng", meaning: "Đợi", example: { zh: "请等一下。", pinyin: "Qǐng děng yíxià.", vi: "Xin đợi một chút." } },
+                { char: "告诉", pinyin: "gàosu", meaning: "Nói cho biết", example: { zh: "你能告诉我怎么去那儿吗？", pinyin: "Nǐ néng gàosu wǒ zěnme qù nàr ma?", vi: "Bạn có thể nói cho tôi biết làm thế nào để đến đó không?" } },
+                { char: "给", pinyin: "gěi", meaning: "Cho", example: { zh: "这本书是给你的。", pinyin: "Zhè běn shū shì gěi nǐ de.", vi: "Quyển sách này là cho bạn." } },
+                { char: "工作", pinyin: "gōngzuò", meaning: "Làm việc", example: { zh: "你爸爸在哪儿工作？", pinyin: "Nǐ bàba zài nǎr gōngzuò?", vi: "Bố bạn làm việc ở đâu?" } },
+                { char: "欢迎", pinyin: "huānyíng", meaning: "Hoan nghênh", example: { zh: "欢迎来到我们家。", pinyin: "Huānyíng láidào wǒmen jiā.", vi: "Chào mừng đến nhà chúng tôi." } },
+                { char: "回答", pinyin: "huídá", meaning: "Trả lời", example: { zh: "请回答我的问题。", pinyin: "Qǐng huídá wǒ de wèntí.", vi: "Xin hãy trả lời câu hỏi của tôi." } },
+                { char: "介绍", pinyin: "jièshào", meaning: "Giới thiệu", example: { zh: "我来介绍一下，这是我的朋友。", pinyin: "Wǒ lái jièshào yíxià, zhè shì wǒ de péngyou.", vi: "Để tôi giới thiệu một chút, đây là bạn của tôi." } },
+                { char: "进", pinyin: "jìn", meaning: "Vào", example: { zh: "请进！", pinyin: "Qǐng jìn!", vi: "Mời vào!" } },
+                { char: "觉得", pinyin: "juéde", meaning: "Cảm thấy", example: { zh: "我觉得这个电影很有意思。", pinyin: "Wǒ juéde zhège diànyǐng hěn yǒuyìsi.", vi: "Tôi cảm thấy bộ phim này rất thú vị." } },
+                { char: "开始", pinyin: "kāishǐ", meaning: "Bắt đầu", example: { zh: "电影什么时候开始？", pinyin: "Diànyǐng shénme shíhou kāishǐ?", vi: "Khi nào phim bắt đầu?" } },
+                { char: "考试", pinyin: "kǎoshì", meaning: "Thi, kiểm tra", example: { zh: "明天有汉语考试。", pinyin: "Míngtiān yǒu Hànyǔ kǎoshì.", vi: "Ngày mai có bài kiểm tra tiếng Hán." } },
+                { char: "可能", pinyin: "kěnéng", meaning: "Có thể, khả năng", example: { zh: "他可能不知道这件事。", pinyin: "Tā kěnéng bù zhīdào zhè jiàn shì.", vi: "Anh ấy có thể không biết chuyện này." } },
+                { char: "旅游", pinyin: "lǚyóu", meaning: "Du lịch", example: { zh: "我喜欢去中国旅游。", pinyin: "Wǒ xǐhuan qù Zhōngguó lǚyóu.", vi: "Tôi thích đi du lịch Trung Quốc." } },
+                { char: "卖", pinyin: "mài", meaning: "Bán", example: { zh: "这个商店卖水果。", pinyin: "Zhège shāngdiàn mài shuǐguǒ.", vi: "Cửa hàng này bán hoa quả." } },
+                { char: "问", pinyin: "wèn", meaning: "Hỏi", example: { zh: "我想问你一个问题。", pinyin: "Wǒ xiǎng wèn nǐ yí ge wèntí.", vi: "Tôi muốn hỏi bạn một câu hỏi." } },
+                { char: "希望", pinyin: "xīwàng", meaning: "Hy vọng", example: { zh: "我希望明天天气好。", pinyin: "Wǒ xīwàng míngtiān tiānqì hǎo.", vi: "Tôi hy vọng thời tiết ngày mai tốt." } },
+                { char: "笑", pinyin: "xiào", meaning: "Cười", example: { zh: "他为什么笑？", pinyin: "Tā wèishénme xiào?", vi: "Tại sao anh ấy cười?" } },
+                { char: "休息", pinyin: "xiūxi", meaning: "Nghỉ ngơi", example: { zh: "工作太累了，我需要休息一下。", pinyin: "Gōngzuò tài lèi le, wǒ xūyào xiūxi yíxià.", vi: "Làm việc mệt quá, tôi cần nghỉ ngơi một chút." } },
+                { char: "学习", pinyin: "xuéxí", meaning: "Học tập", example: { zh: "我们要努力学习。", pinyin: "Wǒmen yào nǔlì xuéxí.", vi: "Chúng ta phải cố gắng học tập." } }, 
+                { char: "运动", pinyin: "yùndòng", meaning: "Vận động, thể thao", example: { zh: "你喜欢什么运动？", pinyin: "Nǐ xǐhuan shénme yùndòng?", vi: "Bạn thích môn thể thao nào?" } },
+                { char: "知道", pinyin: "zhīdào", meaning: "Biết", example: { zh: "我知道这件事。", pinyin: "Wǒ zhīdào zhè jiàn shì.", vi: "Tôi biết chuyện này." } },
+                { char: "准备", pinyin: "zhǔnbèi", meaning: "Chuẩn bị", example: { zh: "你准备好了吗？", pinyin: "Nǐ zhǔnbèi hǎo le ma?", vi: "Bạn chuẩn bị xong chưa?" } },
+                { char: "走", pinyin: "zǒu", meaning: "Đi, rời đi", example: { zh: "我们走吧！", pinyin: "Wǒmen zǒu ba!", vi: "Chúng ta đi thôi!" } },
+                { char: "机场", pinyin: "jīchǎng", meaning: "Sân bay", example: { zh: "我去机场接你。", pinyin: "Wǒ qù jīchǎng jiē nǐ.", vi: "Tôi đến sân bay đón bạn." } },
+                { char: "鸡蛋", pinyin: "jīdàn", meaning: "Trứng gà", example: { zh: "我早饭吃鸡蛋。", pinyin: "Wǒ zǎofàn chī jīdàn.", vi: "Bữa sáng tôi ăn trứng gà." } },
+                { char: "教室", pinyin: "jiàoshì", meaning: "Phòng học", example: { zh: "请保持教室安静。", pinyin: "Qǐng bǎochí jiàoshì ānjìng.", vi: "Xin hãy giữ trật tự trong phòng học." } },
+                { char: "哥哥", pinyin: "gēge", meaning: "Anh trai", example: { zh: "我哥哥比我大三岁。", pinyin: "Wǒ gēge bǐ wǒ dà sān suì.", vi: "Anh trai tôi lớn hơn tôi ba tuổi." } },
+                { char: "姐姐", pinyin: "jiějie", meaning: "Chị gái", example: { zh: "我姐姐是一名护士。", pinyin: "Wǒ jiějie shì yì míng hùshi.", vi: "Chị gái tôi là một y tá." } },
+                { char: "弟弟", pinyin: "dìdi", meaning: "Em trai", example: { zh: "我弟弟喜欢踢足球。", pinyin: "Wǒ dìdi xǐhuan tī zúqiú.", vi: "Em trai tôi thích đá bóng." } },
+                { char: "妹妹", pinyin: "mèimei", meaning: "Em gái", example: { zh: "我妹妹今年上小学。", pinyin: "Wǒ mèimei jīnnián shàng xiǎoxué.", vi: "Em gái tôi năm nay học tiểu học." } },
+                { char: "门", pinyin: "mén", meaning: "Cửa", example: { zh: "请关门。", pinyin: "Qǐng guān mén.", vi: "Xin hãy đóng cửa." } },
+                { char: "面条", pinyin: "miàntiáo", meaning: "Mì sợi", example: { zh: "我喜欢吃牛肉面条。", pinyin: "Wǒ xǐhuan chī niúròu miàntiáo.", vi: "Tôi thích ăn mì bò." } },
+                { char: "牛奶", pinyin: "niúnǎi", meaning: "Sữa bò", example: { zh: "睡觉前喝杯牛奶有助于睡眠。", pinyin: "Shuìjiào qián hē bēi niúnǎi yǒuzhùyú shuìmián.", vi: "Uống một cốc sữa trước khi ngủ giúp dễ ngủ hơn." } },
+                { char: "旁边", pinyin: "pángbiān", meaning: "Bên cạnh", example: { zh: "银行在我家旁边。", pinyin: "Yínháng zài wǒ jiā pángbiān.", vi: "Ngân hàng ở bên cạnh nhà tôi." } },
+                { char: "票", pinyin: "piào", meaning: "Vé", example: { zh: "我买了两张电影票。", pinyin: "Wǒ mǎi le liǎng zhāng diànyǐng piào.", vi: "Tôi đã mua hai vé xem phim." } },
+                { char: "妻子", pinyin: "qīzi", meaning: "Vợ", example: { zh: "他很爱他的妻子。", pinyin: "Tā hěn ài tā de qīzi.", vi: "Anh ấy rất yêu vợ mình." } },
+                { char: "丈夫", pinyin: "zhàngfu", meaning: "Chồng", example: { zh: "她的丈夫是一名律师。", pinyin: "Tā de zhàngfu shì yì míng lǜshī.", vi: "Chồng của cô ấy là một luật sư." } },
+                { char: "晴", pinyin: "qíng", meaning: "Trời quang, nắng", example: { zh: "明天是晴天。", pinyin: "Míngtiān shì qíngtiān.", vi: "Ngày mai trời nắng." } },
+                { char: "身体", pinyin: "shēntǐ", meaning: "Sức khỏe, cơ thể", example: { zh: "祝你身体健康。", pinyin: "Zhù nǐ shēntǐ jiànkāng.", vi: "Chúc bạn sức khỏe dồi dào." } },
+                { char: "事情", pinyin: "shìqing", meaning: "Sự việc, chuyện", example: { zh: "你有什么事情吗？", pinyin: "Nǐ yǒu shénme shìqing ma?", vi: "Bạn có chuyện gì không?" } },
+                { char: "手表", pinyin: "shǒubiǎo", meaning: "Đồng hồ đeo tay", example: { zh: "这块手表很贵。", pinyin: "Zhè kuài shǒubiǎo hěn guì.", vi: "Chiếc đồng hồ này rất đắt." } },
+                { char: "手机", pinyin: "shǒujī", meaning: "Điện thoại di động", example: { zh: "我的手机没电了。", pinyin: "Wǒ de shǒujī méi diàn le.", vi: "Điện thoại của tôi hết pin rồi." } },
+                { char: "题", pinyin: "tí", meaning: "Đề, câu hỏi (trong bài thi)", example: { zh: "这道题太难了。", pinyin: "Zhè dào tí tài nán le.", vi: "Câu hỏi này khó quá." } },
+                { char: "西瓜", pinyin: "xīguā", meaning: "Dưa hấu", example: { zh: "夏天吃西瓜很解渴。", pinyin: "Xiàtiān chī xīguā hěn jiěkě.", vi: "Mùa hè ăn dưa hấu rất giải khát." } },
+                { char: "雪", pinyin: "xuě", meaning: "Tuyết", example: { zh: "冬天这里会下雪。", pinyin: "Dōngtiān zhèli huì xià xuě.", vi: "Mùa đông ở đây sẽ có tuyết rơi." } },
+                { char: "颜色", pinyin: "yánsè", meaning: "Màu sắc", example: { zh: "你喜欢什么颜色？", pinyin: "Nǐ xǐhuan shénme yánsè?", vi: "Bạn thích màu gì?" } },
+                { char: "眼睛", pinyin: "yǎnjing", meaning: "Mắt", example: { zh: "她的眼睛很漂亮。", pinyin: "Tā de yǎnjing hěn piàoliang.", vi: "Đôi mắt của cô ấy rất đẹp." } },
+                { char: "药", pinyin: "yào", meaning: "Thuốc", example: { zh: "生病了要吃药。", pinyin: "Shēngbìng le yào chī yào.", vi: "Bị bệnh rồi phải uống thuốc." } },
+                { char: "意思", pinyin: "yìsi", meaning: "Ý nghĩa", example: { zh: "这句话是什么意思？", pinyin: "Zhè jù huà shì shénme yìsi?", vi: "Câu này có nghĩa là gì?" } },
+                { char: "阴", pinyin: "yīn", meaning: "Trời râm, âm u", example: { zh: "今天天气有点阴。", pinyin: "Jīntiān tiānqì yǒudiǎn yīn.", vi: "Thời tiết hôm nay hơi âm u." } },
+                { char: "鱼", pinyin: "yú", meaning: "Cá", example: { zh: "我喜欢吃鱼。", pinyin: "Wǒ xǐhuan chī yú.", vi: "Tôi thích ăn cá." } },
+                { char: "左边", pinyin: "zuǒbian", meaning: "Bên trái", example: { zh: "邮局在银行的左边。", pinyin: "Yóujú zài yínháng de zuǒbian.", vi: "Bưu điện ở bên trái ngân hàng." } },
+                { char: "右边", pinyin: "yòubian", meaning: "Bên phải", example: { zh: "学校在我家的右边。", pinyin: "Xuéxiào zài wǒ jiā de yòubian.", vi: "Trường học ở bên phải nhà tôi." } },
+                { char: "便宜", pinyin: "piányi", meaning: "Rẻ", example: { zh: "这件衣服很便宜。", pinyin: "Zhè jiàn yīfu hěn piányi.", vi: "Bộ quần áo này rất rẻ." } },
+                { char: "长", pinyin: "cháng", meaning: "Dài", example: { zh: "这条路很长。", pinyin: "Zhè tiáo lù hěn cháng.", vi: "Con đường này rất dài." } },
+                { char: "错", pinyin: "cuò", meaning: "Sai", example: { zh: "对不起，我错了。", pinyin: "Duìbuqǐ, wǒ cuò le.", vi: "Xin lỗi, tôi sai rồi." } },
+                { char: "高", pinyin: "gāo", meaning: "Cao", example: { zh: "他比我高。", pinyin: "Tā bǐ wǒ gāo.", vi: "Anh ấy cao hơn tôi." } },
+                { char: "贵", pinyin: "guì", meaning: "Đắt", example: { zh: "这个手机太贵了。", pinyin: "Zhège shǒujī tài guì le.", vi: "Chiếc điện thoại này đắt quá." } },
+                { char: "好玩儿", pinyin: "hǎowánr", meaning: "Vui, thú vị (để chơi)", example: { zh: "这个游戏很好玩儿。", pinyin: "Zhège yóuxì hěn hǎowánr.", vi: "Trò chơi này rất vui." } },
+                { char: "近", pinyin: "jìn", meaning: "Gần", example: { zh: "我家离学校很近。", pinyin: "Wǒ jiā lí xuéxiào hěn jìn.", vi: "Nhà tôi rất gần trường học." } },
+                { char: "快", pinyin: "kuài", meaning: "Nhanh", example: { zh: "请快一点儿！", pinyin: "Qǐng kuài yìdiǎnr!", vi: "Xin hãy nhanh một chút!" } },
+                { char: "快乐", pinyin: "kuàilè", meaning: "Vui vẻ, hạnh phúc", example: { zh: "祝你生日快乐！", pinyin: "Zhù nǐ shēngrì kuàilè!", vi: "Chúc bạn sinh nhật vui vẻ!" } },
+                { char: "累", pinyin: "lèi", meaning: "Mệt", example: { zh: "我今天很累。", pinyin: "Wǒ jīntiān hěn lèi.", vi: "Hôm nay tôi rất mệt." } },
+                { char: "慢", pinyin: "màn", meaning: "Chậm", example: { zh: "他走路很慢。", pinyin: "Tā zǒulù hěn màn.", vi: "Anh ấy đi bộ rất chậm." } },
+                { char: "忙", pinyin: "máng", meaning: "Bận", example: { zh: "你最近忙吗？", pinyin: "Nǐ zuìjìn máng ma?", vi: "Dạo này bạn có bận không?" } },
+                { char: "每", pinyin: "měi", meaning: "Mỗi", example: { zh: "我每天都学习汉语。", pinyin: "Wǒ měi tiān dōu xuéxí Hànyǔ.", vi: "Tôi mỗi ngày đều học tiếng Hán." } },
+                { char: "新", pinyin: "xīn", meaning: "Mới", example: { zh: "这是一本新书。", pinyin: "Zhè shì yì běn xīn shū.", vi: "Đây là một quyển sách mới." } },
+                { char: "远", pinyin: "yuǎn", meaning: "Xa", example: { zh: "他家离公司很远。", pinyin: "Tā jiā lí gōngsī hěn yuǎn.", vi: "Nhà anh ấy rất xa công ty." } },
+                { char: "真", pinyin: "zhēn", meaning: "Thật, thật sự", example: { zh: "你真漂亮！", pinyin: "Nǐ zhēn piàoliang!", vi: "Bạn thật xinh đẹp!" } },
+                { char: "正在", pinyin: "zhèngzài", meaning: "Đang (tiếp diễn)", example: { zh: "他正在打电话。", pinyin: "Tā zhèngzài dǎ diànhuà.", vi: "Anh ấy đang gọi điện thoại." } },
+                { char: "最", pinyin: "zuì", meaning: "Nhất", example: { zh: "这是我最喜欢的歌。", pinyin: "Zhè shì wǒ zuì xǐhuan de gē.", vi: "Đây là bài hát tôi thích nhất." } },
+                { char: "吧", pinyin: "ba", meaning: "Đi, nhé, nào (trợ từ ngữ khí)", example: { zh: "我们去看电影吧。", pinyin: "Wǒmen qù kàn diànyǐng ba.", vi: "Chúng ta đi xem phim đi." } },
+                { char: "比", pinyin: "bǐ", meaning: "So với, hơn", example: { zh: "他比我高。", pinyin: "Tā bǐ wǒ gāo.", vi: "Anh ấy cao hơn tôi." } },
+                { char: "别", pinyin: "bié", meaning: "Đừng", example: { zh: "别说话！", pinyin: "Bié shuōhuà!", vi: "Đừng nói chuyện!" } },
+                { char: "从", pinyin: "cóng", meaning: "Từ (thời gian, nơi chốn)", example: { zh: "我从北京来。", pinyin: "Wǒ cóng Běijīng lái.", vi: "Tôi từ Bắc Kinh đến." } },
+                { char: "得", pinyin: "de", meaning: "Đến nỗi (trợ từ bổ ngữ)", example: { zh: "他跑得很快。", pinyin: "Tā pǎo de hěn kuài.", vi: "Anh ấy chạy rất nhanh." } },
+                { char: "还", pinyin: "hái", meaning: "Vẫn, còn", example: { zh: "他还在睡觉。", pinyin: "Tā hái zài shuìjiào.", vi: "Anh ấy vẫn còn đang ngủ." } },
+                { char: "就", pinyin: "jiù", meaning: "Thì, là (phó từ)", example: { zh: "我马上就到。", pinyin: "Wǒ mǎshàng jiù dào.", vi: "Tôi sẽ đến ngay." } },
+                { char: "离", pinyin: "lí", meaning: "Cách (khoảng cách)", example: { zh: "我家离学校很近。", pinyin: "Wǒ jiā lí xuéxiào hěn jìn.", vi: "Nhà tôi cách trường rất gần." } },
+                { char: "路", pinyin: "lù", meaning: "Đường", example: { zh: "这条路怎么走？", pinyin: "Zhè tiáo lù zěnme zǒu?", vi: "Con đường này đi như thế nào?" } },
+                { char: "所以", pinyin: "suǒyǐ", meaning: "Cho nên", example: { zh: "因为下雨了，所以我没去。", pinyin: "Yīnwèi xià yǔ le, suǒyǐ wǒ méi qù.", vi: "Bởi vì trời mưa, cho nên tôi không đi." } },
+                { char: "向", pinyin: "xiàng", meaning: "Hướng về", example: { zh: "向前走。", pinyin: "Xiàng qián zǒu.", vi: "Đi về phía trước." } },
+                { char: "因为", pinyin: "yīnwèi", meaning: "Bởi vì", example: { zh: "因为天气不好，所以我们没出去玩。", pinyin: "Yīnwèi tiānqì bù hǎo, suǒyǐ wǒmen méi chūqù wán.", vi: "Bởi vì thời tiết không tốt, cho nên chúng tôi không ra ngoài chơi." } },
+                { char: "已经", pinyin: "yǐjīng", meaning: "Đã", example: { zh: "我已经吃过饭了。", pinyin: "Wǒ yǐjīng chīguo fàn le.", vi: "Tôi đã ăn cơm rồi." } },
+                { char: "一起", pinyin: "yìqǐ", meaning: "Cùng nhau", example: { zh: "我们一起去公园吧。", pinyin: "Wǒmen yìqǐ qù gōngyuán ba.", vi: "Chúng ta cùng nhau đi công viên nhé." } },
+                { char: "再", pinyin: "zài", meaning: "Lại, nữa (trong tương lai)", example: { zh: "明天再来。", pinyin: "Míngtiān zài lái.", vi: "Ngày mai lại đến." } }, 
+            ]
+        };
+        let paragraphData = JSON.parse(JSON.stringify({
+            hsk1: [
+                { title: "Giới thiệu bản thân", zh: "你好！我叫李明。我是中国人。我今年二十岁。我是一名大学生，我在北京学习汉语。我喜欢看书和听音乐。周末我常常和朋友一起去公园玩儿。认识你很高兴！", 
+                  pinyin: "Nǐ hǎo! Wǒ jiào Lǐ Míng. Wǒ shì Zhōngguó rén. Wǒ jīnnián èrshí suì. Wǒ shì yì míng dàxuéshēng, wǒ zài Běijīng xuéxí Hànyǔ. Wǒ xǐhuan kàn shū hé tīng yīnyuè. Zhōumò wǒ chángcháng hé péngyou yìqǐ qù gōngyuán wánr. Rènshi nǐ hěn gāoxìng!", 
+                  vi: "Xin chào! Tôi tên là Lý Minh. Tôi là người Trung Quốc. Năm nay tôi 20 tuổi. Tôi là một sinh viên đại học, tôi học tiếng Hán ở Bắc Kinh. Tôi thích đọc sách và nghe nhạc. Cuối tuần tôi thường cùng bạn bè đi công viên chơi. Rất vui được làm quen với bạn!" },
+                { title: "Đi sở thú", zh: "今天天气非常好。天很蓝，太阳也很好。爸爸妈妈说，我们今天可以去动物园。我很高兴。我喜欢看大熊猫和小猴子。我们早上九点出发，中午在动物园旁边的饭店吃饭。下午我们回家。这会是快乐的一天！", 
+                  pinyin: "Jīntiān tiānqì fēicháng hǎo. Tiān hěn lán, tàiyáng yě hěn hǎo. Bàba māma shuō, wǒmen jīntiān kěyǐ qù dòngwùyuán. Wǒ hěn gāoxìng. Wǒ xǐhuan kàn dàxióngmāo hé xiǎo hóuzi. Wǒmen zǎoshang jiǔ diǎn chūfā, zhōngwǔ zài dòngwùyuán pángbiān de fàndiàn chīfàn. Xiàwǔ wǒmen huí jiā. Zhè huì shì kuàilè de yì tiān!", 
+                  vi: "Thời tiết hôm nay rất đẹp. Trời rất xanh, nắng cũng rất đẹp. Bố mẹ nói, hôm nay chúng ta có thể đi sở thú. Tôi rất vui. Tôi thích xem gấu trúc và khỉ con. Chúng tôi xuất phát lúc 9 giờ sáng, buổi trưa ăn cơm ở nhà hàng bên cạnh sở thú. Buổi chiều chúng tôi về nhà. Đây sẽ là một ngày vui vẻ!" },
+                { title: "Chú mèo Hoa Hoa", zh: "我家有一只小猫。它的名字叫“花花”，因为它身上有很多颜色。花花很喜欢睡觉，也喜欢吃鱼。每天我放学回家，它都会在门口等我。我和花花是好朋友。",
+                  pinyin: "Wǒ jiā yǒu yì zhī xiǎo māo. Tā de míngzi jiào “Huāhuā”, yīnwèi tā shēnshang yǒu hěn duō yánsè. Huāhuā hěn xǐhuan shuìjiào, yě xǐhuan chī yú. Měi tiān wǒ fàngxué huí jiā, tā dōu huì zài ménkǒu děng wǒ. Wǒ hé Huāhuā shì hǎo péngyou.",
+                  vi: "Nhà tôi có một chú mèo con. Tên nó là \"Hoa Hoa\", vì trên người nó có rất nhiều màu sắc. Hoa Hoa rất thích ngủ, cũng thích ăn cá. Mỗi ngày khi tôi đi học về, nó đều đợi tôi ở cửa. Tôi và Hoa Hoa là bạn tốt."}
+            ],
+            hsk2: [
+                { title: "Đi công viên cuối tuần", zh: "昨天是星期六，天气很晴朗。我和我的好朋友小月一起去了市中心的公园。公园里人很多，有老人散步，有孩子玩游戏。我们先在湖边走了走，然后找了个地方坐下来聊天。小月告诉我她下个星期要去上海旅游，她非常兴奋。我们聊了很多开心的事，下午五点多才回家。我希望下次还能和小月一起出去玩。", 
+                  pinyin: "Zuótiān shì xīngqīliù, tiānqì hěn qínglǎng. Wǒ hé wǒ de hǎo péngyou Xiǎoyuè yìqǐ qù le shìzhōngxīn de gōngyuán. Gōngyuán lǐ rén hěn duō, yǒu lǎorén sànbù, yǒu háizi wán yóuxì. Wǒmen xiān zài húbiān zǒu le zǒu, ránhòu zhǎo le ge dìfang zuò xiàlai liáotiān. Xiǎoyuè gàosu wǒ tā xià ge xīngqī yào qù Shànghǎi lǚyóu, tā fēicháng xīngfèn. Wǒmen liáo le hěn duō kāixīn de shì, xiàwǔ wǔ diǎn duō cái huí jiā. Wǒ xīwàng xià cì hái néng hé Xiǎoyuè yìqǐ chūqu wán.", 
+                  vi: "Hôm qua là thứ Bảy, thời tiết rất đẹp. Tôi và bạn thân của tôi, Tiểu Nguyệt, đã cùng nhau đến công viên ở trung tâm thành phố. Trong công viên rất đông người, có người già đi dạo, có trẻ em chơi trò chơi. Chúng tôi trước tiên đi dạo quanh hồ, sau đó tìm một chỗ ngồi xuống nói chuyện. Tiểu Nguyệt nói với tôi rằng tuần sau cô ấy sẽ đi Thượng Hải du lịch, cô ấy rất phấn khích. Chúng tôi đã nói rất nhiều chuyện vui, hơn năm giờ chiều mới về nhà. Tôi hy vọng lần sau vẫn có thể cùng Tiểu Nguyệt ra ngoài chơi." },
+                { title: "Anh trai bác sĩ", zh: "我的哥哥是一名医生。他每天都很忙，常常很晚才回家。虽然工作很辛苦，但是他非常喜欢自己的工作，因为他觉得帮助病人是一件很有意义的事情。哥哥告诉我，要想成为一名好医生，不仅需要学习很多医学知识，还需要有耐心和爱心。我很佩服我的哥哥，希望以后也能做对社会有帮助的工作。", 
+                  pinyin: "Wǒ de gēge shì yì míng yīshēng. Tā měi tiān dōu hěn máng, chángcháng hěn wǎn cái huí jiā. Suīrán gōngzuò hěn xīnkǔ, dànshì tā fēicháng xǐhuan zìjǐ de gōngzuò, yīnwèi tā juéde bāngzhù bìngrén shì yí jiàn hěn yǒu yìyì de shìqing. Gēge gàosu wǒ, yào xiǎng chéngwéi yì míng hǎo yīshēng, bùjǐn xūyào xuéxí hěn duō yīxué zhīshi, hái xūyào yǒu nàixīn hé àixīn. Wǒ hěn pèifú wǒ de gēge, xīwàng yǐhòu yě néng zuò duì shèhuì yǒu bāngzhù de gōngzuò.", 
+                  vi: "Anh trai tôi là một bác sĩ. Anh ấy mỗi ngày đều rất bận, thường rất muộn mới về nhà. Mặc dù công việc rất vất vả, nhưng anh ấy rất thích công việc của mình, vì anh ấy cảm thấy giúp đỡ bệnh nhân là một việc rất có ý nghĩa. Anh trai nói với tôi, muốn trở thành một bác sĩ giỏi, không chỉ cần học rất nhiều kiến thức y học, mà còn cần có sự kiên nhẫn và tình yêu thương. Tôi rất khâm phục anh trai mình, hy vọng sau này cũng có thể làm công việc có ích cho xã hội." },
+                { title: "Chuyến leo núi", zh: "上个星期天，我和家人一起去爬山。山上的空气很新鲜，风景也很美。我们一边爬山，一边聊天，感觉非常轻松。爬到山顶的时候，虽然有点累，但是看到远处的城市和蓝天白云，觉得一切都很值得。爸爸说，运动对身体好，以后我们要多出来走走。我觉得他说得很对。",
+                  pinyin: "Shàng ge xīngqītiān, wǒ hé jiārén yìqǐ qù páshān. Shān shàng de kōngqì hěn xīnxiān, fēngjǐng yě hěn měi. Wǒmen yìbiān páshān, yìbiān liáotiān, gǎnjué fēicháng qīngsōng. Pá dào shāndǐng de shíhou, suīrán yǒudiǎn lèi, dànshì kàn dào yuǎnchù de chéngshì hé lántiān báiyún, juéde yíqiè dōu hěn zhídé. Bàba shuō, yùndòng duì shēntǐ hǎo, yǐhòu wǒmen yào duō chūlai zǒuzou. Wǒ juéde tā shuō de hěn duì.",
+                  vi: "Chủ nhật tuần trước, tôi và gia đình cùng nhau đi leo núi. Không khí trên núi rất trong lành, phong cảnh cũng rất đẹp. Chúng tôi vừa leo núi vừa nói chuyện, cảm thấy rất thoải mái. Khi leo lên đến đỉnh núi, tuy hơi mệt, nhưng nhìn thấy thành phố ở xa và trời xanh mây trắng, cảm thấy mọi thứ đều rất xứng đáng. Bố nói, vận động tốt cho sức khỏe, sau này chúng ta nên ra ngoài đi dạo nhiều hơn. Tôi cảm thấy bố nói rất đúng."}
+            ]
+        }));
+        
+        const grammarData = {
+            hsk1: [
+                { 
+                    title: "Câu chữ 是 (shì)", 
+                    explanation: "Dùng để khẳng định sự vật, sự việc hoặc giới thiệu. Cấu trúc: Chủ ngữ + 是 + Tân ngữ.",
+                    examples: [
+                        { zh: "我是学生。", pinyin: "Wǒ shì xuéshēng.", vi: "Tôi là học sinh." },
+                        { zh: "这是苹果。", pinyin: "Zhè shì píngguǒ.", vi: "Đây là quả táo." },
+                        { zh: "他不是老师。", pinyin: "Tā bú shì lǎoshī.", vi: "Anh ấy không phải là giáo viên. (Phủ định dùng 不)" }
+                    ]
+                },
+                { 
+                    title: "Câu có vị ngữ tính từ", 
+                    explanation: "Dùng để miêu tả tính chất, trạng thái của sự vật, sự việc. Cấu trúc: Chủ ngữ + (Phó từ mức độ) + Tính từ. Phó từ 很 (hěn - rất) thường được dùng.",
+                    examples: [
+                        { zh: "天气很好。", pinyin: "Tiānqì hěn hǎo.", vi: "Thời tiết rất tốt." },
+                        { zh: "他很高兴。", pinyin: "Tā hěn gāoxìng.", vi: "Anh ấy rất vui." },
+                        { zh: "苹果不大。", pinyin: "Píngguǒ bú dà.", vi: "Quả táo không to." }
+                    ]
+                },
+                {
+                    title: "Trợ từ nghi vấn 吗 (ma)",
+                    explanation: "Đặt ở cuối câu trần thuật để tạo thành câu hỏi Có/Không.",
+                    examples: [
+                        { zh: "你是老师吗？", pinyin: "Nǐ shì lǎoshī ma?", vi: "Bạn là giáo viên phải không?" },
+                        { zh: "他喜欢喝茶吗？", pinyin: "Tā xǐhuan hē chá ma?", vi: "Anh ấy thích uống trà không?" }
+                    ]
+                },
+                {
+                    title: "Đại từ nghi vấn 什么 (shénme), 谁 (shéi), 哪儿 (nǎr)",
+                    explanation: "Dùng để hỏi thông tin cụ thể.",
+                    examples: [
+                        { zh: "你叫什么名字？", pinyin: "Nǐ jiào shénme míngzi?", vi: "Bạn tên là gì?" },
+                        { zh: "他是谁？", pinyin: "Tā shì shéi?", vi: "Anh ấy là ai?" },
+                        { zh: "你在哪儿？", pinyin: "Nǐ zài nǎr?", vi: "Bạn ở đâu?" }
+                    ]
+                },
+                 {
+                    title: "Phó từ phủ định 不 (bù) và 没 (méi)",
+                    explanation: "不 (bù) dùng để phủ định hành động ở hiện tại, tương lai, hoặc một thói quen, tính chất. 没 (méi) thường dùng để phủ định hành động đã xảy ra trong quá khứ (thường đi với 有 - yǒu).",
+                    examples: [
+                        { zh: "我不吃米饭。", pinyin: "Wǒ bù chī mǐfàn.", vi: "Tôi không ăn cơm." },
+                        { zh: "他不是医生。", pinyin: "Tā bú shì yīshēng.", vi: "Anh ấy không phải là bác sĩ." },
+                        { zh: "我没有钱。", pinyin: "Wǒ méiyǒu qián.", vi: "Tôi không có tiền." },
+                        { zh: "他没去学校。", pinyin: "Tā méi qù xuéxiào.", vi: "Anh ấy đã không đi học." }
+                    ]
+                }
+            ],
+            hsk2: [
+                { 
+                    title: "Trợ từ kết cấu 的 (de)", 
+                    explanation: "Dùng để biểu thị quan hệ sở hữu hoặc định ngữ. Cấu trúc: Định ngữ + 的 + Trung tâm ngữ.",
+                    examples: [
+                        { zh: "我的书", pinyin: "wǒ de shū", vi: "sách của tôi" },
+                        { zh: "漂亮的衣服", pinyin: "piàoliang de yīfu", vi: "quần áo đẹp" },
+                        { zh: "他买的苹果很好吃。", pinyin: "Tā mǎi de píngguǒ hěn hǎochī.", vi: "Táo anh ấy mua rất ngon." }
+                    ]
+                },
+                { 
+                    title: "Bổ ngữ trạng thái 得 (de)", 
+                    explanation: "Dùng để đánh giá hoặc mô tả kết quả, mức độ của một hành động. Cấu trúc: Động từ + 得 + (Phó từ) + Tính từ/Cụm động từ.",
+                    examples: [
+                        { zh: "他说汉语说得很好。", pinyin: "Tā shuō Hànyǔ shuō de hěn hǎo.", vi: "Anh ấy nói tiếng Hán rất tốt." },
+                        { zh: "你跑得太快了！", pinyin: "Nǐ pǎo de tài kuài le!", vi: "Bạn chạy nhanh quá!" },
+                        { zh: "她高兴得跳了起来。", pinyin: "Tā gāoxìng de tiào le qǐlái.", vi: "Cô ấy vui đến mức nhảy cẫng lên." }
+                    ]
+                },
+                {
+                    title: "Câu chữ 把 (bǎ)",
+                    explanation: "Dùng để nhấn mạnh sự xử lý hoặc tác động lên tân ngữ. Cấu trúc: Chủ ngữ + 把 + Tân ngữ + Động từ + Thành phần khác.",
+                    examples: [
+                        { zh: "请把门打开。", pinyin: "Qǐng bǎ mén dǎkāi.", vi: "Xin hãy mở cửa ra." },
+                        { zh: "我把作业做完了。", pinyin: "Wǒ bǎ zuòyè zuò wán le.", vi: "Tôi đã làm xong bài tập rồi." }
+                    ]
+                },
+                {
+                    title: "So sánh với 比 (bǐ)",
+                    explanation: "Dùng để so sánh hơn kém. Cấu trúc: A + 比 + B + Tính từ (+ một chút/nhiều).",
+                    examples: [
+                        { zh: "他比我高。", pinyin: "Tā bǐ wǒ gāo.", vi: "Anh ấy cao hơn tôi." },
+                        { zh: "今天比昨天冷一点儿。", pinyin: "Jīntiān bǐ zuótiān lěng yìdiǎnr.", vi: "Hôm nay lạnh hơn hôm qua một chút." }
+                    ]
+                },
+                {
+                    title: "Câu tồn hiện (Existential Sentences)",
+                    explanation: "Diễn tả sự tồn tại hoặc xuất hiện của người hoặc vật ở một nơi nào đó. Thường dùng động từ 有 (yǒu), 是 (shì) hoặc các động từ chỉ tư thế (坐, 站, 躺,...).",
+                    examples: [
+                        { zh: "桌子上有一本书。", pinyin: "Zhuōzi shàng yǒu yì běn shū.", vi: "Trên bàn có một quyển sách." },
+                        { zh: "门口站着一个人。", pinyin: "Ménkǒu zhànzhe yí ge rén.", vi: "Trước cửa có một người đang đứng." }
+                    ]
+                }
+            ]
+        };
+
+
+        let currentHSKLevel = 'hsk1';
+        let currentVocabList = vocabData.hsk1;
+        let currentVocabMap = new Map(); 
+        let currentParagraphList = paragraphData.hsk1;
+        let currentGrammarList = grammarData.hsk1; // Added for grammar
+        let currentParagraphIndex = 0;
+        let isListeningTypingSpeechPaused = false; 
+        let currentPlaybackRate = 1; 
+
+        let showPinyinVocab = true;
+        let showMeaningVocab = true;
+        let showExamplesVocab = true;
+        let showOriginalText = false;
+        let showOriginalPinyin = true;
+        let showOriginalVi = true;
+
+        let pomodoroWorkDuration = 25 * 60; 
+        let pomodoroBreakDuration = 5 * 60; 
+        let pomodoroCurrentTime = pomodoroWorkDuration;
+        let pomodoroIntervalId = null;
+        let isPomodoroRunning = false;
+        let isPomodoroWorkSession = true;
+
+
+        const messageBox = document.getElementById('messageBox');
+        const wordTooltip = document.getElementById('wordTooltip');
+        const hsk1ToggleBtn = document.getElementById('hsk1ToggleBtn');
+        const hsk2ToggleBtn = document.getElementById('hsk2ToggleBtn');
+        const mainTabs = document.querySelectorAll('.tab-button-main');
+        const sections = document.querySelectorAll('.section');
+        const vocabGrid = document.getElementById('vocabularyGrid');
+        const togglePinyinBtn = document.getElementById('togglePinyin');
+        const toggleMeaningBtn = document.getElementById('toggleMeaning');
+        const toggleExamplesBtn = document.getElementById('toggleExamples');
+        const pinyinStatusVocabEl = document.getElementById('pinyinStatusVocab');
+        const meaningStatusVocabEl = document.getElementById('meaningStatusVocab');
+        const exampleStatusVocabEl = document.getElementById('exampleStatusVocab');
+        const currentVocabLevelDisplay = document.getElementById('currentVocabLevelDisplay');
+        
+        const currentListeningTypingLevelDisplay = document.getElementById('currentListeningTypingLevelDisplay');
+        const listeningTypingParagraphTitleEl = document.getElementById('listeningTypingParagraphTitle');
+        const playPauseListeningTypingBtn = document.getElementById('playPauseListeningTypingBtn');
+        const playPauseListeningTypingIcon = document.getElementById('playPauseListeningTypingIcon');
+        const playPauseListeningTypingText = document.getElementById('playPauseListeningTypingText');
+        const restartListeningTypingBtn = document.getElementById('restartListeningTypingBtn');
+        const playbackSpeedSelect = document.getElementById('playbackSpeedSelect');
+        const listeningTypingInputArea = document.getElementById('listeningTypingInputArea');
+        const toggleOriginalTextBtn = document.getElementById('toggleOriginalTextBtn');
+        const originalTextDisplayContainer = document.getElementById('originalTextDisplayContainer');
+        const originalTextZhEl = document.getElementById('originalTextZh');
+        const originalTextPinyinEl = document.getElementById('originalTextPinyin');
+        const originalTextViEl = document.getElementById('originalTextVi');
+        const toggleOriginalPinyinBtn = document.getElementById('toggleOriginalPinyinBtn');
+        const toggleOriginalViBtn = document.getElementById('toggleOriginalViBtn');
+        const prevListeningTypingParagraphBtn = document.getElementById('prevListeningTypingParagraphBtn');
+        const nextListeningTypingParagraphBtn = document.getElementById('nextListeningTypingParagraphBtn');
+        
+        const listParagraphsBtn = document.getElementById('listParagraphsBtn');
+        const addCustomParagraphBtn = document.getElementById('addCustomParagraphBtn');
+        const listParagraphsModal = document.getElementById('listParagraphsModal');
+        const addParagraphModal = document.getElementById('addParagraphModal');
+        const modalCloseButtons = document.querySelectorAll('.modal-close-button');
+        const paragraphsListContainer = document.getElementById('paragraphsListContainer');
+        const modalParagraphLevel = document.getElementById('modalParagraphLevel');
+        const customParagraphTitleInput = document.getElementById('customParagraphTitleInput');
+        const customParagraphZh = document.getElementById('customParagraphZh');
+        const customParagraphPinyin = document.getElementById('customParagraphPinyin');
+        const customParagraphVi = document.getElementById('customParagraphVi');
+        const saveCustomParagraphBtn = document.getElementById('saveCustomParagraphBtn');
+
+        // Grammar Elements
+        const currentGrammarLevelDisplay = document.getElementById('currentGrammarLevelDisplay');
+        const grammarPointsContainer = document.getElementById('grammarPointsContainer');
+
+        const floatingPomodoroBubble = document.getElementById('floatingPomodoroBubble');
+        const floatingPomodoroTime = document.getElementById('floatingPomodoroTime');
+        const floatingPomodoroStatusIcon = document.getElementById('floatingPomodoroStatusIcon');
+        const floatingPomodoroStartPause = document.getElementById('floatingPomodoroStartPause');
+        const floatingPomodoroReset = document.getElementById('floatingPomodoroReset');
+        
+        const synth = window.speechSynthesis;
+        let currentListeningTypingUtterance = null;
+        let audioCtx; 
+
+        function showMessage(text, type = 'info', duration = 3000) {
+            messageBox.textContent = text;
+            messageBox.className = `message-box ${type}`;
+            messageBox.classList.add('show');
+            setTimeout(() => messageBox.classList.remove('show'), duration);
+        }
+        
+        function speakGeneric(text, lang = 'zh-CN', rate = 1, onStartCallback, onEndCallback, onPauseCallback, onResumeCallback, utteranceRefSetter) {
+            if (!('speechSynthesis' in window)) {
+                showMessage('Trình duyệt của bạn không hỗ trợ phát âm tự động.', 'error');
+                if (onEndCallback) onEndCallback(false);
+                return;
+            }
+            if (synth.speaking) { synth.cancel(); }
+            
+            const newUtterance = new SpeechSynthesisUtterance(text);
+            newUtterance.lang = lang;
+            newUtterance.rate = rate;
+            newUtterance.onstart = () => { if (onStartCallback) onStartCallback(); };
+            newUtterance.onpause = () => { if (onPauseCallback) onPauseCallback(); };
+            newUtterance.onresume = () => { if (onResumeCallback) onResumeCallback(); };
+            newUtterance.onend = () => {
+                if (onEndCallback) onEndCallback(false); 
+                if (utteranceRefSetter) utteranceRefSetter(null);
+            };
+            newUtterance.onerror = (event) => {
+                console.error('SpeechSynthesisUtterance.onerror', event);
+                showMessage('Lỗi phát âm.', 'error');
+                if (onEndCallback) onEndCallback(false);
+                if (utteranceRefSetter) utteranceRefSetter(null);
+            };
+            if (utteranceRefSetter) utteranceRefSetter(newUtterance);
+            synth.speak(newUtterance);
+        }
+        
+        function updatePlayPauseButtonDOM(iconEl, textEl, isPlaying) { 
+            if (iconEl && textEl) { 
+                iconEl.classList.toggle('fa-play', !isPlaying);
+                iconEl.classList.toggle('fa-pause', isPlaying);
+                textEl.textContent = isPlaying ? 'Tạm dừng' : 'Phát';
+            }
+        }
+         function updateFloatingPomodoroIcon(running) {
+            floatingPomodoroStatusIcon.classList.toggle('fa-play', !running);
+            floatingPomodoroStatusIcon.classList.toggle('fa-pause', running);
+        }
+
+        function createVocabMap() {
+            currentVocabMap.clear();
+            if (currentVocabList) {
+                currentVocabList.forEach(word => {
+                    currentVocabMap.set(word.char, word.meaning);
+                });
+            }
+        }
+
+        function setHSKLevel(level) {
+            currentHSKLevel = level;
+            currentVocabList = vocabData[level] || [];
+            createVocabMap(); 
+            currentParagraphList = paragraphData[level] || [];
+            currentGrammarList = grammarData[level] || []; // Update grammar list
+            currentParagraphIndex = 0;
+            
+            currentVocabLevelDisplay.textContent = level.toUpperCase();
+            currentListeningTypingLevelDisplay.textContent = level.toUpperCase(); 
+            currentGrammarLevelDisplay.textContent = level.toUpperCase(); // Update grammar level display
+            
+            hsk1ToggleBtn.classList.toggle('bg-sky-500', level === 'hsk1');
+            hsk1ToggleBtn.classList.toggle('text-white', level === 'hsk1');
+            hsk1ToggleBtn.classList.toggle('bg-slate-200', level !== 'hsk1');
+            hsk1ToggleBtn.classList.toggle('text-slate-700', level !== 'hsk1');
+            hsk1ToggleBtn.classList.toggle('hover:bg-slate-300', level !== 'hsk1');
+            
+            hsk2ToggleBtn.classList.toggle('bg-sky-500', level === 'hsk2');
+            hsk2ToggleBtn.classList.toggle('text-white', level === 'hsk2');
+            hsk2ToggleBtn.classList.toggle('bg-slate-200', level !== 'hsk2');
+            hsk2ToggleBtn.classList.toggle('text-slate-700', level !== 'hsk2');
+            hsk2ToggleBtn.classList.toggle('hover:bg-slate-300', level !== 'hsk2');
+
+            if (synth.speaking) synth.cancel(); 
+            updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false);
+            isListeningTypingSpeechPaused = false;
+
+            renderVocabulary();
+            renderListeningTypingView(); 
+            renderGrammar(); // Render grammar section
+            showMessage(`Đã chuyển sang ${level.toUpperCase()}`, 'info');
+        }
+
+        hsk1ToggleBtn.addEventListener('click', () => setHSKLevel('hsk1'));
+        hsk2ToggleBtn.addEventListener('click', () => setHSKLevel('hsk2'));
+
+        mainTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                mainTabs.forEach(t => {
+                    t.classList.remove('bg-sky-500', 'bg-violet-500', 'bg-indigo-500', 'text-white', 'active'); 
+                    t.classList.add('text-slate-700', 'bg-slate-200'); 
+                    if (t.dataset.tab === 'vocabulary') t.classList.add('hover:bg-sky-600');
+                    else if (t.dataset.tab === 'listeningTyping') t.classList.add('hover:bg-violet-600'); 
+                    else if (t.dataset.tab === 'grammar') t.classList.add('hover:bg-indigo-600'); 
+                });
+                
+                let activeColor = 'bg-slate-500'; 
+                if (tab.dataset.tab === 'vocabulary') activeColor = 'bg-sky-500';
+                else if (tab.dataset.tab === 'listeningTyping') activeColor = 'bg-violet-500'; 
+                else if (tab.dataset.tab === 'grammar') activeColor = 'bg-indigo-500'; 
+                                    
+                tab.classList.add(activeColor, 'text-white', 'active');
+                tab.classList.remove('text-slate-700', 'bg-slate-200', 'hover:bg-sky-600', 'hover:bg-violet-600', 'hover:bg-indigo-600');
+
+                sections.forEach(section => section.classList.remove('active'));
+                document.getElementById(`${tab.dataset.tab}Section`).classList.add('active');
+                
+                if (synth.speaking) synth.cancel(); 
+                updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false);
+                isListeningTypingSpeechPaused = false;
+            });
+        });
+        
+        function initializeTabs() {
+            const initialVocabTab = document.querySelector('.tab-button-main[data-tab="vocabulary"]');
+            if (initialVocabTab) {
+                initialVocabTab.classList.add('bg-sky-500', 'text-white', 'active');
+                initialVocabTab.classList.remove('text-slate-700', 'bg-slate-200', 'hover:bg-sky-600');
+            }
+            
+            document.querySelectorAll('.tab-button-main:not(.active)').forEach(t => {
+                t.classList.add('bg-slate-200', 'text-slate-700');
+                if (t.dataset.tab === 'listeningTyping') t.classList.add('hover:bg-violet-600');
+                else if (t.dataset.tab === 'grammar') t.classList.add('hover:bg-indigo-600');
+            });
+        }
+
+        function updateVocabStatusDisplay() {
+            pinyinStatusVocabEl.textContent = showPinyinVocab ? 'Hiện' : 'Ẩn';
+            meaningStatusVocabEl.textContent = showMeaningVocab ? 'Hiện' : 'Ẩn';
+            exampleStatusVocabEl.textContent = showExamplesVocab ? 'Hiện' : 'Ẩn';
+        }
+
+        function renderVocabulary() {
+            vocabGrid.innerHTML = '';
+            if (!currentVocabList || currentVocabList.length === 0) {
+                vocabGrid.innerHTML = '<p class="col-span-full text-center text-slate-500">Không có từ vựng nào cho cấp độ này.</p>';
+                updateVocabStatusDisplay(); return;
+            }
+            currentVocabList.forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'vocab-card bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between min-h-[270px] sm:min-h-[250px]';
+                let ex = word.example;
+                card.innerHTML = `
+                    <div>
+                        <div class="char text-center text-red-500 font-bold mb-1">${word.char}</div>
+                        <div class="pinyin text-center text-sky-600 mb-1 ${showPinyinVocab ? '' : 'hidden'}">${word.pinyin}</div>
+                        <div class="meaning text-center text-emerald-700 font-semibold mb-2 ${showMeaningVocab ? '' : 'hidden'}">${word.meaning}</div>
+                        <button class="speak-word-btn action-button bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 w-full mt-1 mb-2 ${!('speechSynthesis'in window)?'opacity-50 cursor-not-allowed':''}" data-char="${word.char}" ${!('speechSynthesis'in window)?'disabled':''}>
+                            <i class="fas fa-volume-up mr-1"></i>Phát âm
+                        </button>
+                    </div>
+                    ${ex ? `<div class="example mt-2 pt-2 border-t border-slate-200 ${showExamplesVocab?'':'hidden'}">
+                        <p class="example-zh text-slate-700">${ex.zh}</p>
+                        <p class="example-pinyin text-sky-500 italic ${showPinyinVocab?'':'hidden'}">${ex.pinyin}</p>
+                        <p class="example-vi text-slate-500 ${showMeaningVocab?'':'hidden'}">${ex.vi}</p>
+                    </div>` : ''}
+                `;
+                vocabGrid.appendChild(card);
+            });
+            updateVocabStatusDisplay();
+            document.querySelectorAll('.speak-word-btn').forEach(b => b.addEventListener('click', e => {
+                const btn = e.target.closest('.speak-word-btn');
+                if(btn) speakGeneric(btn.dataset.char, 'zh-CN', 1, null,null,null,null, ref => {});
+            }));
+        }
+        togglePinyinBtn.addEventListener('click', () => { showPinyinVocab = !showPinyinVocab; renderVocabulary(); showMessage(`Pinyin (Từ vựng & Ví dụ) đã ${showPinyinVocab ? 'hiện' : 'ẩn'}`, 'success'); });
+        toggleMeaningBtn.addEventListener('click', () => { showMeaningVocab = !showMeaningVocab; renderVocabulary(); showMessage(`Nghĩa/Dịch (Từ vựng & Ví dụ) đã ${showMeaningVocab ? 'hiện' : 'ẩn'}`, 'success'); });
+        toggleExamplesBtn.addEventListener('click', () => { showExamplesVocab = !showExamplesVocab; renderVocabulary(); showMessage(`Ví dụ đã ${showExamplesVocab ? 'hiện' : 'ẩn'}`, 'success'); });
+        
+        function navigateParagraphs(direction) {
+            if (currentParagraphList && currentParagraphList.length > 0) {
+                currentParagraphIndex = (direction === 'next') ? (currentParagraphIndex + 1) % currentParagraphList.length : (currentParagraphIndex - 1 + currentParagraphList.length) % currentParagraphList.length;
+                renderListeningTypingView(); 
+            }
+        }
+        prevListeningTypingParagraphBtn.addEventListener('click', () => navigateParagraphs('prev'));
+        nextListeningTypingParagraphBtn.addEventListener('click', () => navigateParagraphs('next'));
+
+        originalTextZhEl.addEventListener('mouseup', (event) => {
+            if (!showOriginalText) return; 
+            const selection = window.getSelection(); const selectedText = selection.toString().trim();
+            if (selectedText) {
+                let meaning = currentVocabMap.get(selectedText);
+                if (!meaning && selectedText.length > 1) {
+                    for (let i = selectedText.length; i > 0; i--) {
+                        const subText = selectedText.substring(0, i);
+                        if (currentVocabMap.has(subText)) { meaning = currentVocabMap.get(subText) + ` (cho: ${subText})`; break; }
+                    }
+                }
+                if (meaning) {
+                    wordTooltip.textContent = meaning; wordTooltip.style.display = 'block';
+                    const range = selection.getRangeAt(0); const rect = range.getBoundingClientRect();
+                    wordTooltip.style.left = `${rect.left + window.scrollX}px`;
+                    wordTooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                } else { wordTooltip.style.display = 'none'; }
+            } else { wordTooltip.style.display = 'none'; }
+        });
+        document.addEventListener('mousedown', (event) => { 
+            if (!originalTextZhEl.contains(event.target) && event.target !== wordTooltip) { 
+                wordTooltip.style.display = 'none'; 
+            } 
+        });
+
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+        modalCloseButtons.forEach(button => { button.addEventListener('click', () => closeModal(button.dataset.modalId)); });
+        window.addEventListener('click', (event) => { if (event.target.classList.contains('modal')) { closeModal(event.target.id); } });
+
+        listParagraphsBtn.addEventListener('click', () => {
+            modalParagraphLevel.textContent = currentHSKLevel.toUpperCase();
+            paragraphsListContainer.innerHTML = '';
+            if (currentParagraphList && currentParagraphList.length > 0) {
+                currentParagraphList.forEach((para, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'paragraph-list-item';
+                    item.textContent = para.title || `Bài ${index + 1}: ${para.zh.substring(0, 30)}...`;
+                    item.addEventListener('click', () => {
+                        currentParagraphIndex = index; 
+                        renderListeningTypingView(); 
+                        closeModal('listParagraphsModal');
+                    });
+                    paragraphsListContainer.appendChild(item);
+                });
+            } else { paragraphsListContainer.innerHTML = '<p class="text-slate-500 p-3">Không có bài nào.</p>'; }
+            openModal('listParagraphsModal');
+        });
+
+        addCustomParagraphBtn.addEventListener('click', () => {
+            customParagraphTitleInput.value = '';
+            customParagraphZh.value = ''; customParagraphPinyin.value = ''; customParagraphVi.value = '';
+            openModal('addParagraphModal');
+        });
+        saveCustomParagraphBtn.addEventListener('click', () => {
+            const title = customParagraphTitleInput.value.trim();
+            const zh = customParagraphZh.value.trim(); 
+            const pinyin = customParagraphPinyin.value.trim(); 
+            const vi = customParagraphVi.value.trim();
+            if (!zh || !pinyin || !vi) { showMessage('Vui lòng điền đầy đủ Tiếng Trung, Pinyin và Nghĩa.', 'error'); return; }
+            
+            const newParagraph = { 
+                title: title || `Tự thêm: ${zh.substring(0,10)}...`, 
+                zh, pinyin, vi, custom: true 
+            };
+            if (!paragraphData[currentHSKLevel]) { paragraphData[currentHSKLevel] = []; }
+            paragraphData[currentHSKLevel].push(newParagraph);
+            currentParagraphList = paragraphData[currentHSKLevel]; 
+            showMessage('Đã thêm bài mới!', 'success'); closeModal('addParagraphModal');
+            currentParagraphIndex = currentParagraphList.length - 1; 
+            renderListeningTypingView();
+        });
+
+        function renderListeningTypingView() {
+            if (!currentParagraphList || currentParagraphList.length === 0) {
+                listeningTypingParagraphTitleEl.textContent = "Không có bài";
+                listeningTypingInputArea.value = ""; listeningTypingInputArea.disabled = true;
+                originalTextDisplayContainer.classList.add('hidden'); 
+                showOriginalText = false; 
+                toggleOriginalTextBtn.innerHTML = `<i class="fas fa-eye mr-2"></i>Hiện Đáp Án / Nội dung đọc`;
+                playPauseListeningTypingBtn.disabled = true; 
+                restartListeningTypingBtn.disabled = true;
+                prevListeningTypingParagraphBtn.disabled = true;
+                nextListeningTypingParagraphBtn.disabled = true;
+                updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false); 
+                return;
+            }
+            listeningTypingInputArea.disabled = false;
+            playPauseListeningTypingBtn.disabled = !('speechSynthesis'in window);
+            restartListeningTypingBtn.disabled = !('speechSynthesis'in window);
+            prevListeningTypingParagraphBtn.disabled = false;
+            nextListeningTypingParagraphBtn.disabled = false;
+
+            const para = currentParagraphList[currentParagraphIndex];
+            listeningTypingParagraphTitleEl.textContent = para.title || `Bài ${currentParagraphIndex + 1}`;
+            listeningTypingInputArea.value = ""; 
+            originalTextZhEl.textContent = para.zh;
+            originalTextPinyinEl.textContent = para.pinyin;
+            originalTextViEl.textContent = para.vi;
+            
+            originalTextDisplayContainer.classList.toggle('hidden', !showOriginalText);
+            toggleOriginalTextBtn.innerHTML = `<i class="fas ${showOriginalText ? 'fa-eye-slash' : 'fa-eye'} mr-2"></i>${showOriginalText ? 'Ẩn' : 'Hiện'} Đáp Án / Nội dung đọc`;
+            
+            originalTextPinyinEl.style.display = showOriginalPinyin ? 'block' : 'none';
+            originalTextViEl.style.display = showOriginalVi ? 'block' : 'none';
+            
+            if (synth.speaking && currentListeningTypingUtterance) synth.cancel();
+            updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false);
+            isListeningTypingSpeechPaused = false;
+        }
+
+        playbackSpeedSelect.addEventListener('change', (event) => {
+            currentPlaybackRate = parseFloat(event.target.value);
+            if (synth.speaking && currentListeningTypingUtterance) { 
+                const textToSpeak = currentParagraphList[currentParagraphIndex].zh;
+                synth.cancel(); 
+                setTimeout(() => {
+                    speakGeneric(textToSpeak, 'zh-CN', currentPlaybackRate,
+                        () => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, true); },
+                        (isPlaying) => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, isPlaying); },
+                        () => { isListeningTypingSpeechPaused = true; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false); },
+                        () => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, true); },
+                        (ref) => currentListeningTypingUtterance = ref
+                    );
+                }, 100);
+            }
+            showMessage(`Tốc độ phát đã đổi thành ${currentPlaybackRate}x`, 'info');
+        });
+
+        playPauseListeningTypingBtn.addEventListener('click', () => {
+            if (!currentParagraphList || currentParagraphList.length === 0 || !('speechSynthesis'in window)) return;
+             if (synth.speaking && currentListeningTypingUtterance) {
+                if (isListeningTypingSpeechPaused) {
+                    synth.resume(); isListeningTypingSpeechPaused = false;
+                    updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, true);
+                } else {
+                    synth.pause(); isListeningTypingSpeechPaused = true;
+                    updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false);
+                }
+            } else {
+                 speakGeneric(currentParagraphList[currentParagraphIndex].zh, 'zh-CN', currentPlaybackRate,
+                    () => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, true); },
+                    (isPlaying) => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, isPlaying); },
+                    () => { isListeningTypingSpeechPaused = true; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, false); },
+                    () => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, true); },
+                    (ref) => currentListeningTypingUtterance = ref
+                );
+            }
+        });
+
+        restartListeningTypingBtn.addEventListener('click', () => {
+            if (!currentParagraphList || currentParagraphList.length === 0 || !('speechSynthesis'in window)) return;
+            if (synth.speaking) synth.cancel(); isListeningTypingSpeechPaused = false;
+            speakGeneric(currentParagraphList[currentParagraphIndex].zh, 'zh-CN', currentPlaybackRate,
+                () => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, true); },
+                (isPlaying) => { isListeningTypingSpeechPaused = false; updatePlayPauseButtonDOM(playPauseListeningTypingIcon, playPauseListeningTypingText, isPlaying); },
+                null, null, (ref) => currentListeningTypingUtterance = ref
+            );
+        });
+
+        toggleOriginalTextBtn.addEventListener('click', () => {
+            showOriginalText = !showOriginalText;
+            originalTextDisplayContainer.classList.toggle('hidden', !showOriginalText);
+            toggleOriginalTextBtn.innerHTML = `<i class="fas ${showOriginalText ? 'fa-eye-slash' : 'fa-eye'} mr-2"></i>${showOriginalText ? 'Ẩn' : 'Hiện'} Đáp Án / Nội dung đọc`;
+        });
+        toggleOriginalPinyinBtn.addEventListener('click', () => {
+            showOriginalPinyin = !showOriginalPinyin;
+            originalTextPinyinEl.style.display = showOriginalPinyin ? 'block' : 'none';
+            showMessage(`Pinyin đáp án ${showOriginalPinyin ? 'hiện' : 'ẩn'}`, 'success');
+        });
+        toggleOriginalViBtn.addEventListener('click', () => {
+            showOriginalVi = !showOriginalVi;
+            originalTextViEl.style.display = showOriginalVi ? 'block' : 'none';
+            showMessage(`Nghĩa đáp án ${showOriginalVi ? 'hiện' : 'ẩn'}`, 'success');
+        });
+
+        // --- Grammar Section Logic ---
+        function renderGrammar() {
+            grammarPointsContainer.innerHTML = '';
+            if (!currentGrammarList || currentGrammarList.length === 0) {
+                grammarPointsContainer.innerHTML = '<p class="text-center text-slate-500">Không có điểm ngữ pháp nào cho cấp độ này.</p>';
+                return;
+            }
+            currentGrammarList.forEach(point => {
+                const pointDiv = document.createElement('div');
+                pointDiv.className = 'grammar-point';
+                
+                let examplesHtml = '<div class="examples mt-3">';
+                point.examples.forEach(ex => {
+                    examplesHtml += `
+                        <div class="example-item">
+                            <p class="example-zh">${ex.zh}</p>
+                            <p class="example-pinyin">${ex.pinyin}</p>
+                            <p class="example-vi">${ex.vi}</p>
+                        </div>
+                    `;
+                });
+                examplesHtml += '</div>';
+
+                pointDiv.innerHTML = `
+                    <h4>${point.title}</h4>
+                    <p class="explanation">${point.explanation}</p>
+                    ${examplesHtml}
+                `;
+                grammarPointsContainer.appendChild(pointDiv);
+            });
+        }
+
+
+        // --- Pomodoro Timer Logic ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateFloatingPomodoroDisplay() {
+            floatingPomodoroTime.textContent = formatTime(pomodoroCurrentTime);
+            floatingPomodoroBubble.classList.toggle('work', isPomodoroWorkSession && isPomodoroRunning);
+            floatingPomodoroBubble.classList.toggle('break', !isPomodoroWorkSession && isPomodoroRunning);
+             if (!isPomodoroRunning && pomodoroCurrentTime === (isPomodoroWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration)) {
+                floatingPomodoroBubble.classList.remove('work', 'break'); 
+            }
+        }
+        
+        function playTickSound(count = 3, intervalMs = 150, freq = 1200, type = 'triangle', durationMs = 50) {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.warn("Web Audio API is not supported in this browser.");
+                    return;
+                }
+            }
+            if (!audioCtx) return;
+
+            for (let i = 0; i < count; i++) {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime + (i * intervalMs / 1000));
+                
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime + (i * intervalMs / 1000)); 
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + (i * intervalMs / 1000) + (durationMs / 1000));
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.start(audioCtx.currentTime + (i * intervalMs / 1000));
+                oscillator.stop(audioCtx.currentTime + (i * intervalMs / 1000) + (durationMs / 1000));
+            }
+        }
+
+
+        function startPomodoroSession() {
+            isPomodoroRunning = true;
+            updateFloatingPomodoroIcon(true);
+            updateFloatingPomodoroDisplay(); 
+
+            pomodoroIntervalId = setInterval(() => {
+                pomodoroCurrentTime--;
+                updateFloatingPomodoroDisplay();
+
+                if (pomodoroCurrentTime < 0) {
+                    clearInterval(pomodoroIntervalId);
+                    isPomodoroRunning = false;
+                    
+                    const sessionType = isPomodoroWorkSession ? "Làm việc" : "Nghỉ giải lao";
+                    showMessage(`Đã kết thúc phiên ${sessionType}!`, 'warning', 5000);
+                    playTickSound(); 
+
+                    isPomodoroWorkSession = !isPomodoroWorkSession;
+                    pomodoroCurrentTime = isPomodoroWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration;
+                    updateFloatingPomodoroDisplay();
+                    updateFloatingPomodoroIcon(false);
+                }
+            }, 1000);
+        }
+
+        floatingPomodoroStartPause.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            if (isPomodoroRunning) { 
+                clearInterval(pomodoroIntervalId);
+                isPomodoroRunning = false;
+                updateFloatingPomodoroIcon(false);
+            } else { 
+                startPomodoroSession();
+            }
+        });
+         floatingPomodoroBubble.addEventListener('click', () => { 
+            if (isPomodoroRunning) { 
+                clearInterval(pomodoroIntervalId);
+                isPomodoroRunning = false;
+                updateFloatingPomodoroIcon(false);
+            } else { 
+                startPomodoroSession();
+            }
+        });
+
+
+        floatingPomodoroReset.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            clearInterval(pomodoroIntervalId);
+            isPomodoroRunning = false;
+            isPomodoroWorkSession = true;
+            pomodoroCurrentTime = pomodoroWorkDuration;
+            updateFloatingPomodoroDisplay();
+            updateFloatingPomodoroIcon(false);
+            showMessage('Đồng hồ Pomodoro đã được đặt lại.', 'info');
+        });
+
+
+        // --- Initial Setup ---
+        initializeTabs();
+        setHSKLevel('hsk1'); 
+        updateFloatingPomodoroDisplay(); 
+        updateFloatingPomodoroIcon(false); 
+        showMessage('Chào mừng! Hãy chọn cấp độ HSK và bắt đầu học.', 'info', 4000);
+        
+        window.addEventListener('beforeunload', () => { if (synth && synth.speaking) { synth.cancel(); } });
+    </script>
+</body>
+</html>
